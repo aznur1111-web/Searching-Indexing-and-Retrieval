@@ -1,0 +1,1723 @@
+<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="description" content="Az Search Lab, a single-file course for searching, indexing and retrieval"><title>Az Search Lab</title>
+<style>
+:root{color-scheme:dark;--bg:#111722;--panel:#192230;--panel2:#202b3a;--panel3:#141c27;--line:#2c394b;--line2:#3b4b61;--text:#e8eef7;--muted:#a7b4c7;--subtle:#8190a5;--accent:#8ab4f8;--strong:#c9ddff;--good:#9ed7bd;--warn:#edc477;--bad:#ff929e;--shadow:none;--radius:13px}
+:root[data-theme=light]{color-scheme:light;--bg:#f4f6f8;--panel:#fff;--panel2:#f7f9fb;--panel3:#f0f4f8;--line:#dce2e9;--line2:#cbd4df;--text:#17212d;--muted:#596a7e;--subtle:#718197;--accent:#315fa2;--strong:#244a82;--good:#176b4c;--warn:#8c5c04;--bad:#b33143;--shadow:0 8px 24px rgba(20,35,50,.05)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button,a,select{touch-action:manipulation}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}a{color:var(--accent);text-decoration:none}.muted{color:var(--muted)}.mono,code,pre,textarea{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.topbar{height:64px;position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:18px;padding:0 22px;background:var(--bg);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text)}.brand-mark{width:34px;height:34px;border:1px solid var(--line2);border-radius:10px;background:var(--panel2);display:grid;place-items:center;color:var(--strong);font-weight:850;font-size:15px}.brand strong{display:block;font-size:14px;line-height:1.2}.brand small{display:block;font-size:10px;letter-spacing:.14em;color:var(--muted);margin-top:2px}
+.top-meta{flex:1;color:var(--subtle);font-size:12px;letter-spacing:.02em}
+.top-actions{display:flex;align-items:center;gap:7px}.top-actions label{font-size:11px;color:var(--muted)}
+select,.btn{border:1px solid var(--line2);background:var(--panel3);color:var(--text);border-radius:8px;padding:8px 11px;font-size:12px}.btn{font-weight:600;white-space:nowrap}.btn:hover{border-color:var(--accent);color:var(--strong)}.btn.primary{background:var(--accent);color:#10203a;border-color:var(--accent)}:root[data-theme=light] .btn.primary{color:white}
+.layout{display:grid;grid-template-columns:264px minmax(420px,1fr);max-width:1500px;margin:auto;min-height:calc(100vh - 64px)}
+.sidebar{position:sticky;top:64px;height:calc(100vh - 64px);overflow:auto;border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column}
+.side-title{display:flex;justify-content:space-between;color:var(--subtle);font-size:10px;letter-spacing:.14em;font-weight:800;padding:0 4px 12px}
+.pill,.tag{border:1px solid var(--line2);border-radius:6px;padding:3px 7px;font-size:10px;color:var(--muted);white-space:nowrap}
+.search{display:flex;gap:7px;align-items:center;border:1px solid var(--line);border-radius:9px;background:var(--panel3);height:39px;padding:0 10px;margin-bottom:10px}
+.search input{min-width:0;width:100%;background:transparent;border:0;outline:0;color:var(--text);font-size:12px}
+.search kbd{border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--subtle);font-size:10px}
+.filter{display:block;color:var(--subtle);font-size:11px;margin-bottom:12px}.filter select{display:block;width:100%;max-width:none;margin-top:5px;padding:7px}
+.tree{display:flex;flex-direction:column;gap:12px}
+.group-label{display:flex;justify-content:space-between;color:var(--subtle);font-size:10px;font-weight:800;letter-spacing:.08em;padding:4px 5px}
+.link{width:100%;text-align:left;display:flex;gap:8px;align-items:center;background:transparent;border:1px solid transparent;color:var(--muted);padding:7px 8px;border-radius:8px;min-height:34px}
+.link .num{font:10px ui-monospace,monospace;color:var(--subtle);width:19px;flex:none}
+.link .name{font-size:12px;flex:1}.link .done{color:var(--good)}
+.link:hover{background:var(--panel2);color:var(--text)}
+.link.active{background:var(--panel2);border-color:var(--line2);color:var(--strong)}
+.side-foot{margin-top:auto;border-top:1px solid var(--line);padding-top:14px}
+.progress-row{display:flex;justify-content:space-between;color:var(--subtle);font-size:11px;margin-bottom:7px}
+.progress{height:5px;background:var(--panel2);border-radius:9px;overflow:hidden}.progress>div{height:100%;width:0;background:var(--accent);transition:width .25s}
+.side-actions{display:flex;gap:6px;margin-top:12px}.side-actions .btn{flex:1;padding:7px;font-size:11px}
+main{max-width:920px;width:100%;min-width:0;margin:auto;padding:28px 30px 40px}
+.breadcrumb{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--subtle);margin-bottom:16px}
+.header{padding:2px 2px 22px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.13em;font-weight:800;color:var(--accent);margin-bottom:9px}
+.header h1{font-size:clamp(27px,3vw,36px);line-height:1.12;letter-spacing:-.035em;margin:0 0 10px;font-weight:700}
+.header p{font-size:14.5px;color:var(--muted);margin:0 0 14px;max-width:740px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}
+.header-actions{display:flex;gap:7px;margin-top:16px;flex-wrap:wrap}
+.panel{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow)}
+.panel-head{padding:18px 20px 0}.panel-head h2{font-size:15px;margin:0 0 4px;letter-spacing:-.01em;font-weight:650}.panel-head p{font-size:12.5px;color:var(--muted);margin:0}
+.body{padding:16px 20px 20px}
+.idea{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:20px}
+.idea p{font-size:13.5px;color:var(--muted);margin:0 0 13px}
+.mental{background:var(--panel3);border:1px solid var(--line);border-radius:10px;padding:13px}
+.mental small{color:var(--subtle);font-size:10px;letter-spacing:.11em;text-transform:uppercase}
+.mental strong{display:block;margin:6px 0;font-size:13px;color:var(--strong)}
+.mental p{font-size:12px;color:var(--muted);margin:0}
+.takeaway{padding:11px 13px;border:1px solid var(--line2);background:var(--panel3);border-radius:8px;color:var(--strong);font-size:12.5px;line-height:1.6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mini{background:var(--panel3);border:1px solid var(--line);border-radius:10px;padding:13px}
+.mini h3{font-size:12px;margin:0 0 7px;font-weight:650}
+.mini p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.6}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px}
+.steps li{counter-increment:s;display:flex;gap:10px;color:var(--muted);font-size:12.5px;line-height:1.55}
+.steps li:before{content:counter(s);width:23px;height:23px;flex:none;display:grid;place-items:center;border:1px solid var(--line2);background:var(--panel3);border-radius:6px;color:var(--accent);font:11px ui-monospace,monospace}
+.pseudo{white-space:pre-wrap;overflow:auto;background:var(--panel3);border:1px solid var(--line);border-radius:10px;padding:14px;font:12px/1.75 ui-monospace,monospace;color:var(--strong);margin:0}
+.table-wrap{overflow:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);text-align:left;padding:9px 10px;vertical-align:top}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--subtle);font-weight:700}
+td{color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{padding:12px;background:var(--panel3);border:1px solid var(--line);border-radius:9px}
+.tile span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--subtle)}
+.tile strong{display:block;color:var(--strong);font:700 14px ui-monospace,monospace;margin-top:6px}
+.tile small{font-size:10.5px;color:var(--muted);display:block;margin-top:2px}
+.notice{padding:12px 13px;background:var(--panel3);border:1px solid color-mix(in srgb,var(--warn) 35%,var(--line));border-radius:9px;font-size:12.5px;color:var(--muted);line-height:1.65}
+.notice strong{color:var(--warn)}
+.notice.info{border-color:var(--line2)}.notice.info strong{color:var(--accent)}
+.lab-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lab-top label{font-size:11.5px;color:var(--muted)}
+.lab-input{width:100%;min-height:90px;resize:vertical;background:var(--panel3);border:1px solid var(--line2);border-radius:9px;padding:11px;color:var(--text);font:12px/1.65 ui-monospace,monospace;margin:11px 0}
+.lab-output{padding:13px;background:var(--panel3);border:1px solid var(--line);border-radius:9px;min-height:70px;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--strong);font:12px/1.75 ui-monospace,monospace;overflow-x:auto}
+.lab-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.label{font-size:10px;color:var(--subtle);font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.code-head{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:11px 13px;background:var(--panel3);border-bottom:1px solid var(--line)}
+.code-editor{display:block;width:100%;min-height:220px;resize:vertical;border:0;border-radius:0;background:var(--panel3);color:var(--text);padding:15px;font:12px/1.7 ui-monospace,monospace;outline:0}
+.code-foot{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 13px;color:var(--subtle);font-size:10px;border-top:1px solid var(--line)}
+.practice{border:1px solid var(--line);background:var(--panel3);border-radius:9px;padding:13px}
+.practice summary{cursor:pointer;font-size:12.5px;font-weight:600}
+.practice p{font-size:12.5px;color:var(--muted);margin:10px 0 0;line-height:1.65}
+.references{display:flex;flex-direction:column;gap:8px}
+.references a{font-size:12.5px;overflow-wrap:anywhere}
+.home-hero{padding:30px;background:linear-gradient(150deg,var(--panel),var(--panel3));border:1px solid var(--line);border-radius:14px;margin-bottom:16px}
+.home-hero h1{font-size:clamp(30px,3.6vw,42px);line-height:1.1;letter-spacing:-.04em;margin:8px 0 14px;font-weight:700}
+.home-hero p{color:var(--muted);font-size:14px;max-width:720px;margin:0 0 18px;line-height:1.65}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.stat strong{display:block;font:700 22px ui-monospace,monospace;color:var(--strong)}
+.stat span{display:block;font-size:10.5px;color:var(--muted);margin-top:3px}
+.chapter-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chapter-card{padding:14px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text)}
+.chapter-card:hover{border-color:var(--accent)}
+.chapter-card .num{font-size:10px;color:var(--accent);letter-spacing:.09em;font-weight:800}
+.chapter-card strong{display:block;font-size:13px;margin:5px 0;font-weight:650}
+.chapter-card p{font-size:11.5px;color:var(--muted);margin:0;line-height:1.55}
+.toast{position:fixed;z-index:99;bottom:20px;left:50%;transform:translate(-50%,10px);opacity:0;pointer-events:none;background:var(--panel);border:1px solid var(--line2);border-radius:9px;padding:11px 15px;box-shadow:var(--shadow);font-size:12px;transition:opacity .14s,transform .14s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.footer{font-size:10.5px;color:var(--subtle);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:6px 2px 14px;align-items:center}
+@media(max-width:1080px){.layout{grid-template-columns:240px minmax(360px,1fr)}main{padding:24px 22px 36px}}
+@media(max-width:840px){.topbar{height:auto;min-height:60px;flex-wrap:wrap;gap:10px;padding:10px 14px}.top-meta{display:none}.top-actions{margin-left:auto}.top-actions label{display:none}.layout{display:block}.sidebar{position:static;height:auto;max-height:none;border:0;border-bottom:1px solid var(--line);padding:14px}.tree{max-height:260px;overflow:auto}.side-foot{display:none}main{padding:20px 15px 32px}.idea{grid-template-columns:1fr}.mental{order:-1}.stats{grid-template-columns:1fr 1fr}.chapter-cards,.two,.lab-cols{grid-template-columns:1fr}}
+@media(max-width:520px){.brand small{display:none}.brand-mark{width:30px;height:30px}.brand strong{font-size:12px}.top-actions select{max-width:92px;padding:6px;font-size:10px}.top-actions .btn{padding:6px 8px;font-size:10px}.chapter-cards{grid-template-columns:1fr}.tiles{grid-template-columns:1fr}.home-hero{padding:20px}.home-hero h1{font-size:30px}.header h1{font-size:27px}.body,.panel-head{padding-left:15px;padding-right:15px}.footer{display:block}.footer span{display:block;margin-bottom:6px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+@media print{.topbar,.sidebar,.header-actions,.lab-top,.btn,.toast{display:none!important}.layout{display:block}main{padding:0;max-width:none}.panel,.home-hero{break-inside:avoid;box-shadow:none}body{background:#fff;color:#111}}
+</style></head><body>
+
+<header class="topbar">
+  <a class="brand" href="#home" id="homeLink"><span class="brand-mark">Az</span><span><strong>Az Search Lab</strong><small>SEARCHING · INDEXING · RETRIEVAL</small></span></a>
+  <div class="top-meta" id="catalogCount"></div>
+  <div class="top-actions">
+    <label for="themeSelect">Theme</label>
+    <select id="themeSelect" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+    <button class="btn" id="printBtn">Print / PDF</button>
+    <button class="btn" id="exportBtn">Export</button>
+    <button class="btn" id="importBtn">Import</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" aria-label="Course navigation">
+    <div class="side-title"><span>COURSE CATALOG</span><span class="pill" id="lessonCount">0</span></div>
+    <div class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="Search search topics…" aria-label="Search lessons"><kbd>/</kbd></div>
+    <label class="filter">Chapter<select id="chapterFilter"><option value="all">All chapters</option></select></label>
+    <nav class="tree" id="courseTree" aria-label="Lessons"></nav>
+    <div class="side-foot">
+      <div class="progress-row"><span>COURSE PROGRESS</span><strong id="progressText">0 / 0</strong></div>
+      <div class="progress" id="progressBar"><div id="progressFill"></div></div>
+      <div class="side-actions"><button class="btn" data-page="home">Home</button><button class="btn" data-page="progress">Progress</button></div>
+    </div>
+  </aside>
+  <main id="mainView" tabindex="-1" aria-live="polite"></main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   Az Search Lab
+   ============================================================ */
+const CHAPTERS=[
+ {id:"foundations",title:"1. Search foundations",desc:"Linear, binary, ternary, interpolation and exponential search.",ids:["linear-search","binary-search","ternary-search","interpolation-exponential"]},
+ {id:"boundaries",title:"2. Search on answer and boundaries",desc:"Lower and upper bound, monotonic predicates and parametric search.",ids:["lower-upper-bound","monotonic-predicates","parametric-search"]},
+ {id:"hash-tree-lookup",title:"3. Hash-based and ordered lookup",desc:"Hash tables, balanced trees, skip lists and direct addressing.",ids:["hash-lookup","balanced-trees","skip-lists","direct-addressing"]},
+ {id:"prefix-dictionary",title:"4. Prefix and dictionary search",desc:"Trie, radix trie, Patricia trie, ternary search tree and burst trie.",ids:["trie","radix-trie","patricia-trie","tst","burst-trie"]},
+ {id:"compressed-text",title:"5. Compressed text indexes",desc:"Suffix arrays, suffix automata, FM-index, wavelet trees, DAWG and FSTs.",ids:["suffix-arrays","suffix-automata","fm-index","wavelet-trees","dawg-fst"]},
+ {id:"disk-db",title:"6. Disk and database indexes",desc:"B-tree, B+ tree, Bε-tree, ISAM, inverted index and learned indexes.",ids:["b-tree","b-plus-tree","b-epsilon-tree","isam","inverted-index","learned-indexes"]},
+ {id:"fuzzy",title:"7. Fuzzy and approximate lookup",desc:"Edit distance, BK-tree, Levenshtein automata, SymSpell, Soundex and Metaphone.",ids:["edit-distance","bk-tree","levenshtein-automata","symspell","soundex-metaphone"]},
+ {id:"nearest-neighbour",title:"8. Nearest-neighbour search",desc:"k-d tree, ball tree, VP-tree, HNSW, IVF, Annoy, ScaNN and DiskANN.",ids:["kd-tree","ball-tree","vp-tree","hnsw","ivf-annoy","scann-diskann"]},
+ {id:"vector-search",title:"9. Vector search and compression",desc:"Product quantization, scalar quantization, LSH, reranking and hybrid search.",ids:["product-quantization","scalar-quantization","lsh","reranking-hybrid"]},
+ {id:"spatial-ranked",title:"10. Spatial and ranked retrieval",desc:"Eytzinger, van Emde Boas, Z-order, Hilbert, Geohash, S2, H3, WAND and LambdaMART.",ids:["eytzinger-van-emde","zorder-hilbert","geohash-s2-h3","wand-lambdamart"]}
+];
+
+const D={
+ kind:"Concept",status:"Concept lesson",level:2,demo:"none",demoTitle:"Interactive teaching lab",inputKind:"text",refs:[],codeKey:"generic",
+ input:"A data structure, query and parameters.",
+ output:"A location, a match, a ranked list or a nearest neighbour set.",
+ invariant:"The structure must preserve the ordering or distance property the search relies on. Violating it produces wrong results without an error.",
+ complexity:["Depends on data size and structure","Depends on storage layout","Measure on representative data"],
+ uses:"Use this as one layer inside a larger search or retrieval pipeline.",
+ strength:"Fits the problem it was designed for when the assumptions hold.",
+ limits:"Depends on data distribution, query type and hardware.",
+ pitfall:"A method that works on small in-memory data can fail on disk or at scale.",
+ question:"What is the main idea of this lesson?",
+ trace:null
+};
+function mk(o){
+ const steps=o.steps||["Inspect the data and query.","Apply the search rule.","Produce the result.","Check correctness and cost."];
+ return Object.assign({},D,{
+  summary:o.summary||"",
+  mental:o.mental||o.title,
+  mentalText:o.mentalText||o.summary||"",
+  problem:o.problem||("How does "+o.title+" work and when is it the right choice?"),
+  steps:steps,
+  trace:o.trace||steps.map((s,i)=>["Step "+(i+1),s,i===steps.length-1?"Verified":"Step done"]),
+  answer:o.answer||o.summary||"",
+  pseudo:o.pseudo||"",
+  sample:o.sample||"",
+  level:o.level||2
+ },o);
+}
+
+const RAW=[
+/* Chapter 1 */
+{id:"linear-search",title:"Linear search",level:1,kind:"Foundation",status:"Runnable teaching lab",
+ summary:"Linear search checks each element in order until it finds the target or reaches the end. It is the simplest search and works on any sequence, sorted or not.",
+ mental:"Looking through a shelf book by book",
+ mentalText:"Start at the first item. Compare with the target. If it matches, stop. Otherwise move to the next. Repeat until you find it or run out of items.",
+ steps:["Start at index 0.","Compare the current element with the target.","If equal, return the index.","Otherwise increment the index and repeat.","If the end is reached, return not found."],
+ pseudo:"linear_search(A, x):\n  for i in range(len(A)):\n    if A[i] == x: return i\n  return -1\n\nTime complexity:\n  best case:    O(1)      target is first\n  average case: O(n)\n  worst case:   O(n)      target is last or absent\n\nWorks on unsorted data.",
+ uses:"Small arrays, unsorted data, linked lists, sequential file scans, sentinel searches.",
+ strength:"Simple. Works on any sequence. No preprocessing needed.",
+ limits:"Slow on large data. O(n) lookups cannot scale to millions of items.",
+ pitfall:"Linear search on a sorted array wastes the sorted property. Use binary search instead.",
+ question:"When is linear search better than binary search?",
+ answer:"When the data is small, unsorted, stored as a linked list, or the target is likely to be near the start of the sequence.",
+ demo:"linear-search",sample:"10, 20, 30, 40, 50, 60, 70, 80, 90, 100\n40",
+ refs:[["Knuth, The Art of Computer Programming, Vol. 3, Section 6.1","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["CLRS, Introduction to Algorithms, 4th ed., Chapter 2","https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/"],["Wikipedia, Linear search","https://en.wikipedia.org/wiki/Linear_search"]]},
+{id:"binary-search",title:"Binary search",level:2,kind:"Algorithm",status:"Runnable teaching lab",
+ summary:"Binary search finds a target in a sorted array by repeatedly halving the search range. It runs in O(log n) time.",
+ mental:"Guessing a number and being told higher or lower",
+ mentalText:"You guess the middle. If the target is larger, discard the lower half. If smaller, discard the upper half. Repeat until found.",
+ steps:["Set low to 0 and high to n minus 1.","Compute the middle index.","If A[mid] equals the target, return mid.","If A[mid] is less than the target, set low to mid plus 1.","Otherwise set high to mid minus 1.","Repeat until low exceeds high."],
+ pseudo:"binary_search(A, x):\n  low, high = 0, len(A) - 1\n  while low <= high:\n    mid = low + (high - low) // 2\n    if A[mid] == x: return mid\n    if A[mid] < x: low = mid + 1\n    else: high = mid - 1\n  return -1\n\nTime: O(log n)\n\nInteger overflow: use low + (high - low) // 2\nnot (low + high) // 2 for fixed-width integers.",
+ invariant:"The search range must be sorted. After each step the target is either in the remaining half or absent.",
+ uses:"Sorted arrays, dictionary lookup, lower/upper bound, searching in sorted files.",
+ strength:"Very fast. log2 of a billion is about 30.",
+ limits:"Requires sorted data. Random access is needed, so it does not work on linked lists efficiently.",
+ pitfall:"Computing mid as (low + high) // 2 can overflow in languages with fixed-width integers. Use low + (high - low) // 2.",
+ question:"How many comparisons does binary search need for a sorted array of one million elements?",
+ answer:"At most 20. log2(1,000,000) is about 19.93, so 20 comparisons in the worst case.",
+ demo:"binary-search",sample:"10, 20, 30, 40, 50, 60, 70, 80, 90, 100\n40",
+ refs:[["Knuth, TAOCP Vol. 3, Section 6.2.1","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["CLRS, Chapter 2 and Chapter 3","https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/"],["Bentley, Programming Pearls, Column 4","https://www.informit.com/store/programming-pearls-9780201657883"],["Wikipedia, Binary search algorithm","https://en.wikipedia.org/wiki/Binary_search_algorithm"]]},
+{id:"ternary-search",title:"Ternary search",level:3,kind:"Algorithm",status:"Runnable teaching lab",
+ summary:"Ternary search splits the range into three parts. It is used to find the minimum or maximum of a unimodal function and takes O(log base 3 of n) iterations.",
+ mental:"Splitting the range into three equal parts",
+ mentalText:"Pick two points at one third and two thirds of the range. Whichever side has the larger value contains the maximum. Discard the other third.",
+ steps:["Set the range [low, high].","Pick mid1 at one third and mid2 at two thirds.","If f(mid1) is less than f(mid2), the maximum is in [mid1, high].","Otherwise the maximum is in [low, mid2].","Repeat until the range is small enough."],
+ pseudo:"ternary_search_max(f, low, high):\n  for _ in range(200):\n    if high - low < 1e-9: break\n    m1 = low + (high - low) / 3\n    m2 = high - (high - low) / 3\n    if f(m1) < f(m2): low = m1\n    else: high = m2\n  return (low + high) / 2\n\nTime: O(log n) but two function evaluations per step",
+ uses:"Finding the minimum or maximum of a unimodal function, optimization, computational geometry.",
+ strength:"Simple and reliable for unimodal functions.",
+ limits:"Two function evaluations per step, so it is usually slower than golden-section search or Newton's method.",
+ pitfall:"Ternary search on a sorted array is slower than binary search. Use it only for unimodal optimization.",
+ question:"How is ternary search different from binary search?",
+ answer:"Binary search finds a value in a sorted array. Ternary search finds the extremum of a unimodal function. Different problems.",
+ demo:"ternary-search",sample:"-5, 1\n1, 0\n5, 0",
+ refs:[["CLRS, Introduction to Algorithms, Chapter 4","https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/"],["Boyd and Vandenberghe, Convex Optimization","https://web.stanford.edu/~boyd/cvxbook/"],["Wikipedia, Ternary search","https://en.wikipedia.org/wiki/Ternary_search"]]},
+{id:"interpolation-exponential",title:"Interpolation and exponential search",level:3,kind:"Algorithm",status:"Runnable teaching lab",
+ summary:"Interpolation search estimates the target position based on the value distribution. Exponential search finds the range first, then does binary search inside it.",
+ mental:"Guessing the right page and doubling until you find the range",
+ mentalText:"Interpolation search is like opening a dictionary at the estimated letter. Exponential search is like doubling the range until you bracket the target, then searching the bracket.",
+ steps:["Interpolation: estimate the position from the value ratio.","Check the estimate. Adjust low or high accordingly.","Exponential: start at index 1, double until A[bound] >= target.","Then binary search in [bound/2, bound]."],
+ pseudo:"Interpolation search (uniform distribution):\n  pos = low + ((x - A[low]) * (high - low)) / (A[high] - A[low])\n  Average: O(log log n) for uniform data\n  Worst: O(n)\n\nExponential search:\n  bound = 1\n  while bound < n and A[bound] < x:\n    bound *= 2\n  binary_search(A[bound // 2 : min(bound, n)], x)\n  Time: O(log i) where i is the target position",
+ uses:"Interpolation for uniformly distributed numeric data. Exponential for unbounded or unknown-size arrays and sorted streams.",
+ strength:"Interpolation can beat binary search on uniform data. Exponential works when the size is unknown.",
+ limits:"Interpolation degrades to O(n) on non-uniform data. Exponential needs a doubling phase.",
+ pitfall:"Interpolation search on data that is not uniformly distributed can be much slower than binary search. Check the distribution first.",
+ question:"When does exponential search beat binary search?",
+ answer:"When the target is near the start and you do not know the array size ahead of time. Exponential finds the range in O(log i) where i is the target position.",
+ demo:"interp-exp",sample:"10, 20, 30, 40, 50, 60, 70, 80, 90, 100\n70",
+ refs:[["Knuth, TAOCP Vol. 3, Section 6.2.1 exercise on interpolation","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["Perl, Italiano, Sedgewick, Interpolation search, CACM 1978","https://doi.org/10.1145/359460.359478"],["Bentley and Yao, An almost optimal algorithm for unbounded searching, 1976","https://doi.org/10.1016/0020-0190(76)90071-5"],["Wikipedia, Interpolation search","https://en.wikipedia.org/wiki/Interpolation_search"]]},
+/* Chapter 2 */
+{id:"lower-upper-bound",title:"Lower and upper bound",level:3,kind:"Boundary search",status:"Runnable teaching lab",
+ summary:"Lower bound finds the first position where A[i] is not less than the target. Upper bound finds the first position where A[i] is greater than the target. Both are O(log n).",
+ mental:"Finding the boundary between two regions",
+ mentalText:"Lower bound is the left edge of the range where the target appears. Upper bound is the right edge plus one. They bracket the target.",
+ steps:["Lower bound: binary search for the first index where A[i] >= x.","Upper bound: binary search for the first index where A[i] > x.","Equal range is [lower, upper).","Both return n if all elements are smaller."],
+ pseudo:"lower_bound(A, x):\n  low, high = 0, len(A)\n  while low < high:\n    mid = (low + high) // 2\n    if A[mid] < x: low = mid + 1\n    else: high = mid\n  return low\n\nupper_bound(A, x):\n  low, high = 0, len(A)\n  while low < high:\n    mid = (low + high) // 2\n    if A[mid] <= x: low = mid + 1\n    else: high = mid\n  return low\n\nEqual range: [lower_bound, upper_bound)\n\nC++ std::lower_bound and std::upper_bound implement these.\nPython bisect_left and bisect_right implement these.",
+ uses:"Finding all occurrences of a value, binary search on answer, range queries, sorted set operations.",
+ strength:"Exact and O(log n). The half-open interval convention is clean.",
+ limits:"Requires sorted data. Same integer overflow considerations as binary search.",
+ pitfall:"lower_bound returns the first index >= x, not the index of x. If x is absent it returns where x would go.",
+ question:"A = [1, 3, 3, 3, 5, 7]. What are lower and upper bound of 3?",
+ answer:"lower_bound = 1 and upper_bound = 4. The three 3s are at indices 1, 2 and 3.",
+ demo:"lower-upper",sample:"1, 3, 3, 3, 5, 7\n3",
+ refs:[["Sedgewick and Wayne, Algorithms, 4th ed., Section 1.4","https://algs4.cs.princeton.edu/home/"],["C++ standard library documentation, lower_bound","https://en.cppreference.com/w/cpp/algorithm/lower_bound"],["Python bisect module documentation","https://docs.python.org/3/library/bisect.html"]]},
+{id:"monotonic-predicates",title:"Binary search on monotonic predicates",level:3,kind:"Pattern",status:"Runnable teaching lab",
+ summary:"Binary search on a monotonic predicate finds the boundary where a Boolean condition flips from false to true. It is much more general than searching a sorted array.",
+ mental:"Finding the switch point on a long dial",
+ mentalText:"You have a function that returns false for small values and true for large ones. Binary search finds where it flips.",
+ steps:["Define a predicate P(x) that is monotonic (false then true, or true then false).","Set the range of x.","Binary search for the boundary.","The answer is the smallest x with P(x) true."],
+ pseudo:"binary_search_predicate(P, low, high):\n  # P must be monotone: once true, stays true\n  while low < high:\n    mid = low + (high - low) // 2\n    if P(mid): high = mid\n    else: low = mid + 1\n  return low\n\nClassic examples:\n  - smallest x such that x^2 >= n\n  - smallest capacity that ships all packages in d days\n  - smallest speed that finishes all jobs in h hours\n  - maximum value such that condition still holds",
+ uses:"Optimization, scheduling, capacity planning, allocation problems, game theory.",
+ strength:"Turns a search over a huge range into O(log range) predicate calls.",
+ limits:"Requires the predicate to be truly monotonic. A non-monotonic predicate gives wrong answers.",
+ pitfall:"If the predicate is not monotonic, the binary search may return an arbitrary boundary. Always test monotonicity on small cases first.",
+ question:"You want the smallest integer x such that x^3 >= 1000. What is the answer and how does the binary search find it?",
+ answer:"x = 10 because 10^3 = 1000. Binary search in [1, 1000] finds 10 in about 10 steps.",
+ demo:"monotonic",sample:"1000",
+ refs:[["Skiena, The Algorithm Design Manual, 3rd ed., Springer 2020","https://www.algorist.com/"],["cp-algorithms.com, Binary search on answer","https://cp-algorithms.com/"],["LeetCode discussion, Binary search on answer pattern","https://leetcode.com/tag/binary-search/"]]},
+{id:"parametric-search",title:"Parametric search",level:5,kind:"Advanced pattern",status:"Concept lesson",
+ summary:"Parametric search uses a decision algorithm to find the optimal value of a parameter. It solves optimization problems by reducing them to a sequence of decision problems.",
+ mental:"Turning an optimization into a series of yes or no questions",
+ mentalText:"Instead of directly finding the best value, ask whether a given value is feasible. Use binary search on the parameter.",
+ steps:["Define the decision problem: given a parameter t, is there a solution with cost <= t?","Prove the decision problem is monotonic.","Binary search the parameter space.","The answer is the smallest t where the decision returns true."],
+ pseudo:"parametric_search(decision, low, high):\n  # decision(t) returns true if cost <= t is feasible\n  while high - low > eps:\n    mid = (low + high) / 2\n    if decision(mid): high = mid\n    else: low = mid\n  return high\n\nClassic examples:\n  - Smallest enclosing circle (Megiddo)\n  - Linear programming in fixed dimension\n  - Minimum ratio spanning tree\n  - Slope selection (Cole et al., 1989)",
+ uses:"Computational geometry, optimization with constraints, minimum ratio problems, robust statistics.",
+ strength:"Reduces optimization to decision, which is often easier to solve.",
+ limits:"The decision algorithm must be correct and monotonic. The reduction can add a log factor.",
+ pitfall:"Parametric search is not the same as binary search on answer. The decision algorithm often needs special structure to be efficient.",
+ question:"How does parametric search differ from binary search on answer?",
+ answer:"Binary search on answer uses a fixed decision algorithm. Parametric search may use the decision algorithm to guide the search directly, avoiding a binary search on the parameter.",
+ demo:"none",sample:"",
+ refs:[["Megiddo, Combinatorial optimization with rational objective functions, Math. of OR 1979","https://doi.org/10.1287/moor.4.4.414"],["Cole, Slowing down sorting networks to obtain faster sorting algorithms, JACM 1987","https://doi.org/10.1145/7531.7535"],["Agarwal and Sharir, Efficient algorithms for geometric optimization, ACM Computing Surveys 1998","https://doi.org/10.1145/289268.289271"],["Wikipedia, Parametric search","https://en.wikipedia.org/wiki/Parametric_search"]]},
+/* Chapter 3 */
+{id:"hash-lookup",title:"Hash table lookup",level:2,kind:"Data structure",status:"Runnable teaching lab",
+ summary:"A hash table maps keys to values with O(1) average lookup. Collisions are handled by chaining or open addressing.",
+ mental:"A wall of numbered mailboxes",
+ mentalText:"The hash function computes the mailbox number. Two keys can land on the same mailbox, so the mailbox must hold more than one item.",
+ steps:["Compute the hash of the key.","Reduce it to an index with a modulo or a mask.","Look in the bucket.","Compare the stored key with the search key."],
+ pseudo:"hash table with chaining:\n  buckets = array of lists of size m\n\n  insert(k, v):\n    i = hash(k) mod m\n    buckets[i].append((k, v))\n\n  lookup(k):\n    i = hash(k) mod m\n    for (key, val) in buckets[i]:\n      if key == k: return val\n    return not found\n\nOpen addressing (linear probing):\n  i = hash(k) mod m\n  while buckets[i] is occupied and buckets[i].key != k:\n    i = (i + 1) mod m\n\nLoad factor alpha = n / m.\nLookup cost: O(1 + alpha) for chaining.",
+ uses:"Dictionaries, caches, symbol tables, sets, deduplication, joins in databases.",
+ strength:"Average O(1) lookup, insert and delete.",
+ limits:"Worst case O(n). Requires a good hash function. Not ordered, so range queries are not supported.",
+ pitfall:"A poor hash function causes clustering and degrades to O(n). Use a cryptographic or well-mixed hash for adversarial inputs.",
+ question:"Why does load factor matter for hash table performance?",
+ answer:"Higher load factor means more collisions. For chaining, cost is O(1 + alpha). For open addressing, the cost grows much faster beyond alpha = 0.75.",
+ demo:"hash-lookup",sample:"apple\nbanana\ncherry\ndate\nelderberry\nfig\ngrape\nhoneydew\n\ncherry",
+ refs:[["CLRS, Introduction to Algorithms, Chapter 11 Hash Tables","https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/"],["Knuth, TAOCP Vol. 3, Section 6.4 Hashing","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["Cormen et al., hash table survey in Chapter 11","https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/"]]},
+{id:"balanced-trees",title:"Balanced trees",level:3,kind:"Data structure",status:"Concept lesson",
+ summary:"Balanced search trees keep height O(log n) under insertions and deletions. AVL and red-black trees are the most common variants.",
+ mental:"A tree that keeps itself short",
+ mentalText:"Inserting sorted keys into a plain binary search tree creates a chain. Balanced trees rotate nodes to keep the height logarithmic.",
+ steps:["Insert or delete a node.","Check the balance condition.","Rotate if the condition is violated.","Restore the invariants of the tree."],
+ pseudo:"Red-black tree invariants:\n  1. Every node is red or black\n  2. Root is black\n  3. Red nodes have black children\n  4. Every path from a node to its leaves has the same number of black nodes\n\nAVL tree invariant:\n  |height(left) - height(right)| <= 1 for every node\n\nOperations: O(log n) worst case.\n\nUsed in:\n  std::map and std::set in C++ (red-black)\n  TreeMap in Java (red-black)\n  Linux kernel CFS scheduler (red-black)\n  Many database indexes at the in-memory level",
+ uses:"Ordered dictionaries, range queries, database indexes, scheduling, interval trees.",
+ strength:"Worst-case O(log n) for all operations. Supports ordered iteration and range queries.",
+ limits:"Constant factors are higher than hash tables for pure lookup. Requires rotations on insert and delete.",
+ pitfall:"Balanced trees keep logarithmic height for the number of nodes, not for the number of keys. Concurrent access needs careful locking or persistent versions.",
+ question:"Why are red-black trees often preferred over AVL trees?",
+ answer:"Red-black trees do fewer rotations on average because they allow more imbalance. This makes them faster for insert-heavy workloads like kernel data structures.",
+ demo:"none",sample:"",
+ refs:[["Guibas and Sedgewick, A dichromatic framework for balanced trees, FOCS 1978","https://doi.org/10.1109/SFCS.1978.3"],["Adelson-Velsky and Landis, An algorithm for the organization of information, 1962","https://doi.org/10.1016/B978-0-08-011588-3.50006-4"],["CLRS, Chapter 13 Red-Black Trees","https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/"]]},
+{id:"skip-lists",title:"Skip lists",level:3,kind:"Data structure",status:"Runnable teaching lab",
+ summary:"A skip list is a linked list with multiple levels of express lanes. Each higher level skips over more elements, giving O(log n) expected search time.",
+ mental:"Express trains that skip most stations",
+ mentalText:"The bottom level has all elements. Higher levels have fewer elements. Searching starts at the top and drops down when the next element is too large.",
+ steps:["Insert: choose a random level for the new node.","Insert it into all levels up to that height.","Search: start at the top level.","Advance while the next node is smaller than the target.","Drop down a level when the next node is too large."],
+ pseudo:"Skip list insert with level p = 0.5:\n  level = 1\n  while random() < p and level < max_level:\n    level += 1\n\n  # Find the insertion point at each level\n  for l in range(level, 0, -1):\n    prev = find_position_at_level(l, key)\n    insert after prev\n\nSearch:\n  node = head\n  for l in range(max_level, 0, -1):\n    while node.next[l] and node.next[l].key < x:\n      node = node.next[l]\n  return node.next[1]\n\nExpected time: O(log n)\nExpected space: O(n)",
+ uses:"Ordered sets and maps in Redis, LevelDB memtable, skip list indexes in modern databases.",
+ strength:"Simpler to implement than balanced trees. Concurrent versions are easy because insertions are mostly local.",
+ limits:"Expected complexity, not worst case. Uses more memory than balanced trees because of the express lanes.",
+ pitfall:"The random level distribution affects the performance. A geometric distribution with p = 0.5 is standard.",
+ question:"Why does a skip list use less code than a red-black tree?",
+ answer:"Skip lists do not need rotations. Insertion is just splicing nodes into multiple levels. This makes the code simpler and the concurrent version easier.",
+ demo:"skip-list",sample:"10, 30, 50, 70, 90, 110, 130, 150, 170, 190\n110",
+ refs:[["Pugh, Skip lists: a probabilistic alternative to balanced trees, CACM 1990","https://doi.org/10.1145/78973.78977"],["Redis documentation, sorted sets use skip lists","https://redis.io/docs/data-types/sorted-sets/"],["CLRS, Chapter 11 problem on skip lists","https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/"]]},
+{id:"direct-addressing",title:"Direct addressing",level:2,kind:"Data structure",status:"Concept lesson",
+ summary:"Direct addressing uses the key itself as the array index. It gives O(1) lookup but requires the key space to be small and dense.",
+ mental:"A shelf with a slot for every possible item",
+ mentalText:"If your keys are integers from 1 to 1 million, you can just use an array of size 1 million and index by the key.",
+ steps:["Choose an array size equal to the maximum key.","Use the key as the index directly.","Store the value at that index.","Unused slots are empty or a sentinel."],
+ pseudo:"direct_address(T, k):\n  return T[k]\n\nDirect addressing requires:\n  - keys are integers in a known range\n  - the range is small enough to allocate\n  - memory is not a concern\n\nTime: O(1) worst case\nSpace: O(universe size)\n\nUses:\n  - Boolean arrays (bitset)\n  - Character frequency tables (array of 256)\n  - Counting sort and radix sort subroutines\n  - Hash table with no hash function (perfect hashing for dense keys)",
+ uses:"Counting sort, bitsets, small dense key spaces, character tables.",
+ strength:"O(1) worst case, no hashing, no collisions.",
+ limits:"Wastes memory when the key space is sparse. Not usable when keys are strings or large integers.",
+ pitfall:"Direct addressing on a sparse key space wastes memory. Use a hash table or a balanced tree instead.",
+ question:"When is direct addressing a good choice?",
+ answer:"When the key space is small and dense enough that allocating an array for the whole range is practical. For example, counting characters in a string.",
+ demo:"none",sample:"",
+ refs:[["CLRS, Section 11.1 Direct-address tables","https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/"],["Knuth, TAOCP Vol. 3, Section 6.4 direct addressing","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["Sedgewick and Wayne, Algorithms, Section 3.5","https://algs4.cs.princeton.edu/home/"]]},
+/* Chapter 4 */
+{id:"trie",title:"Trie (prefix tree)",level:3,kind:"Data structure",status:"Runnable teaching lab",
+ summary:"A trie stores strings by their characters. Each node represents a prefix. Lookups take O(m) time where m is the string length, independent of the number of stored strings.",
+ mental:"A tree where each edge is a letter",
+ mentalText:"Root is the empty string. From the root, one edge for each possible first letter. Each subtree holds all strings starting with that prefix.",
+ steps:["Insert: walk down the trie for each character.","Create nodes for missing characters.","Mark the last node as a word.","Search: walk down following the characters.","Return whether the final node is marked."],
+ pseudo:"class TrieNode:\n  children = {}\n  is_end = False\n\ninsert(word):\n  node = root\n  for ch in word:\n    if ch not in node.children:\n      node.children[ch] = TrieNode()\n    node = node.children[ch]\n  node.is_end = True\n\nsearch(word):\n  node = root\n  for ch in word:\n    if ch not in node.children: return False\n    node = node.children[ch]\n  return node.is_end\n\nTime: O(m) where m is the word length.\nSpace: O(total characters across all strings).",
+ uses:"Autocomplete, spell check, IP routing (longest prefix match), T9 predictive text, string search.",
+ strength:"Prefix queries are natural. Lookup time does not depend on the number of stored strings.",
+ limits:"Memory-heavy for large alphabets or sparse tries. Cache-unfriendly because of pointer chasing.",
+ pitfall:"A trie with one node per character wastes memory for large alphabets. Use a radix trie or a ternary search tree to compress.",
+ question:"How much memory does a trie for 100,000 English words take?",
+ answer:"Roughly 300,000 to 500,000 nodes, which is a few megabytes of pointers. A radix trie can cut this by 3 to 5 times.",
+ demo:"trie",sample:"apple\napp\napply\nbanana\nband\nbank\n\nap\nban",
+ refs:[["Fredkin, Trie memory, CACM 1960","https://doi.org/10.1145/367390.367400"],["Knuth, TAOCP Vol. 3, Section 6.3 digital searching","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["Sedgewick and Wayne, Algorithms, Section 5.2 Tries","https://algs4.cs.princeton.edu/home/"]]},
+{id:"radix-trie",title:"Radix trie and Patricia trie",level:4,kind:"Data structure",status:"Runnable teaching lab",
+ summary:"A radix trie compresses chains of single-child nodes into one edge labeled with a substring. A Patricia trie is a radix trie with additional invariants.",
+ mental:"Merging paths that have no branches",
+ mentalText:"If a node has only one child, merge the two edges into one. The new edge carries more characters but keeps the same structure.",
+ steps:["Insert a string by finding the longest matching edge.","If the edge is a prefix of the string, recurse into the child.","If the edge shares a prefix, split it.","Otherwise create a new edge."],
+ pseudo:"Radix trie (compressed trie):\n  Each edge is labeled with a substring, not a single character.\n\n  Insert(word):\n    Find longest prefix match along edges\n    If exactly match: mark node as word end\n    If partial match on an edge: split the edge\n    Otherwise: create a new leaf\n\n  Lookup is O(m) where m is the word length.\n\nPatricia trie:\n  Every internal node has at least two children.\n  Edges store the index of the differing bit (for binary keys).\n  Used in IP routing tables (longest prefix match).",
+ uses:"IP routing (Patricia trie for longest prefix match), text indexing, dictionary compression, DNS lookup.",
+ strength:"Compresses chains of single-child nodes. Much less memory than a plain trie.",
+ limits:"Insertions are more complex than in a plain trie. Edge labels need extra care.",
+ pitfall:"The Patricia trie is for binary keys (bit strings). For general strings use a radix trie.",
+ question:"How does a radix trie save memory compared to a plain trie?",
+ answer:"It merges chains of single-child nodes into one edge. Instead of one node per character, you have one node per branching point.",
+ demo:"radix-trie",sample:"apple\napp\napply\nbanana\nband\nbank",
+ refs:[["Morrison, PATRICIA: Practical Algorithm To Retrieve Information Coded in Alphanumeric, JACM 1968","https://doi.org/10.1145/321479.321481"],["Knuth, TAOCP Vol. 3, Section 6.3","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["Sedgewick and Wayne, Algorithms, Section 5.2","https://algs4.cs.princeton.edu/home/"]]},
+{id:"tst",title:"Ternary search tree",level:4,kind:"Data structure",status:"Runnable teaching lab",
+ summary:"A ternary search tree combines a binary search tree with a trie. Each node holds one character, with three children: less, equal, greater. It uses less memory than a trie for sparse alphabets.",
+ mental:"A trie that only branches when necessary",
+ mentalText:"Each node has a character. If the search character is less, go left. If greater, go right. If equal, go down and move to the next character.",
+ steps:["Insert: compare the current character with the node's character.","Move left or right until equal.","Move down to the next character.","Mark the end of the word."],
+ pseudo:"class TSTNode:\n  char c\n  left, mid, right = None, None, None\n  is_end = False\n\ninsert(word, index=0):\n  if index == len(word): mark is_end; return\n  c = word[index]\n  if c < node.c: recurse left\n  elif c > node.c: recurse right\n  else: recurse mid with index + 1\n\nLookup: O(m + log k) expected where k is the branching factor.",
+ uses:"Spell check, autocomplete, dictionary lookup, text editors (word completion).",
+ strength:"Less memory than a plain trie for sparse alphabets. Similar query performance.",
+ limits:"Slightly slower lookups than a plain trie because of the binary search at each level.",
+ pitfall:"The ternary search tree is not a trie. It uses a tree structure per character, so the analysis is different.",
+ question:"When is a ternary search tree better than a trie?",
+ answer:"When the alphabet is large or sparse, such as Unicode. The ternary structure avoids allocating a full array per node.",
+ demo:"tst",sample:"apple\napp\napply\nbanana\nband\nbank\n\nap\nband",
+ refs:[["Bentley and Sedgewick, Fast algorithms for sorting and searching strings, SODA 1997","https://doi.org/10.1145/258533.258604"],["Sedgewick and Wayne, Algorithms, Section 5.2","https://algs4.cs.princeton.edu/home/"],["Clement, Pattis, TST implementation notes","https://www.cs.cmu.edu/~pattis/15-1XX/15-200/lectures/tst/"]]},
+{id:"burst-trie",title:"Burst trie",level:5,kind:"Data structure",status:"Concept lesson",
+ summary:"A burst trie is a trie where each node stores a small bucket until the bucket is full. When the bucket overflows, it bursts into a new trie node.",
+ mental:"Small buckets that split when they get full",
+ mentalText:"Instead of one node per character, each node holds a bucket of strings. When the bucket is too large, it splits.",
+ steps:["Insert a string into the bucket at the root.","When the bucket exceeds a threshold, burst it.","Distribute the strings into child buckets based on the next character.","Recurse if a child bucket also overflows."],
+ pseudo:"Burst trie:\n  Each node holds a bucket of strings up to a threshold (e.g., 100).\n\n  Insert:\n    Find the target bucket by walking the trie prefix.\n    Append the string to the bucket.\n    If the bucket size exceeds the threshold: burst it.\n\n  Burst:\n    Create child nodes for each distinct next character.\n    Distribute the strings into the child buckets.\n\n  Used in the \"Judy\" array and some string dictionary libraries.",
+ uses:"In-memory string dictionaries, IP lookup, database indexes with prefix search.",
+ strength:"Combines the memory efficiency of buckets with the fast prefix lookup of tries.",
+ limits:"More complex than a plain trie. The burst threshold needs tuning.",
+ pitfall:"The burst threshold affects both memory and speed. Too small and you get many nodes. Too large and you scan the bucket linearly.",
+ question:"How does a burst trie reduce memory compared to a plain trie?",
+ answer:"Chains of single-child nodes are collapsed into buckets. Instead of one node per character, you have one bucket per prefix until the bucket overflows.",
+ demo:"none",sample:"",
+ refs:[["Heinz, Zobel, Williams, Burst tries: a fast, efficient data structure for string keys, ACM TOIS 2002","https://doi.org/10.1145/506309.506312"],["Askitis and Zobel, Cache-conscious collision resolution in string hash tables, SPIRE 2005","https://doi.org/10.1007/11575832_11"],["Bentley and Sedgewick, Fast algorithms for sorting and searching strings, SODA 1997","https://doi.org/10.1145/258533.258604"]]},
+/* Chapter 5 */
+{id:"suffix-arrays",title:"Suffix arrays",level:4,kind:"Text index",status:"Runnable teaching lab",
+ summary:"A suffix array is the sorted list of all suffixes of a string. It supports substring search in O(m log n) time without building a full suffix tree.",
+ mental:"All suffixes of a string, sorted alphabetically",
+ mentalText:"Take every suffix of the string and sort them. The position in the original string where each suffix starts is the suffix array.",
+ steps:["List all suffixes of the string.","Sort them lexicographically.","Store the starting position of each suffix.","Search by binary searching for the pattern."],
+ pseudo:"Suffix array SA for string s:\n  SA[i] = start position of the i-th smallest suffix\n\nFor s = 'banana':\n  suffixes: banana, anana, nana, ana, na, a\n  sorted:  a, ana, anana, banana, na, nana\n  SA = [5, 3, 1, 0, 4, 2]\n\nConstruction:\n  naive sort: O(n^2 log n)\n  prefix doubling: O(n log^2 n)\n  SA-IS: O(n) linear time\n\nPattern search:\n  binary search in the sorted suffix array\n  O(m log n)",
+ uses:"Full-text search, genome alignment, data compression (BWT), plagiarism detection.",
+ strength:"Compact representation (4 bytes per suffix for n bytes). Fast pattern matching.",
+ limits:"Construction is more complex than a trie. The LCP array is needed for efficient tree operations.",
+ pitfall:"A naive suffix array construction is slow. Use SA-IS or DC3 for large inputs.",
+ question:"What is the suffix array of 'mississippi'?",
+ answer:"[10, 7, 4, 1, 0, 9, 8, 6, 3, 5, 2]. The suffixes sorted alphabetically start at these positions.",
+ demo:"suffix-array",sample:"banana",
+ refs:[["Manber and Myers, Suffix arrays: a new method for on-line string searches, SODA 1990","https://doi.org/10.1137/0222058"],["Karkkainen and Sanders, Simple linear work suffix array construction, ICALP 2003","https://doi.org/10.1007/3-540-45061-0_73"],["Nong, Zhang, Chan, Two efficient algorithms for linear time suffix array construction, IEEE TC 2011","https://doi.org/10.1109/TC.2010.188"]]},
+{id:"suffix-automata",title:"Suffix automata",level:5,kind:"Text index",status:"Concept lesson",
+ summary:"A suffix automaton is the minimal deterministic finite automaton that recognizes all suffixes of a string. It has O(n) states and supports O(m) pattern matching.",
+ mental:"A compressed automaton that accepts all substrings",
+ mentalText:"The automaton has states and transitions. Starting at the initial state and reading characters, every path corresponds to a substring of the original string.",
+ steps:["Initialize with the initial state.","Add characters one at a time.","For each new character, create new states and links.","The result is the minimal DFA for the set of suffixes."],
+ pseudo:"Suffix automaton construction (online):\n  sa = [initial state]\n  last = initial\n\n  for c in string:\n    cur = new state with len = last.len + 1\n    p = last\n    while p and c not in p.transitions:\n      p.transitions[c] = cur\n      p = p.link\n    if p is None: cur.link = initial\n    else:\n      q = p.transitions[c]\n      if q.len == p.len + 1: cur.link = q\n      else:\n        clone = copy of q with len = p.len + 1\n        while p and p.transitions[c] == q:\n          p.transitions[c] = clone\n          p = p.link\n        q.link = clone\n        cur.link = clone\n    last = cur\n\nSize: O(n) states, O(n) transitions",
+ uses:"String matching, counting distinct substrings, longest common substring, genome analysis.",
+ strength:"Compact O(n) representation. O(m) pattern matching. Counts distinct substrings in O(n).",
+ limits:"Complex to implement correctly. Cloning logic is tricky.",
+ pitfall:"The suffix automaton recognizes all substrings, not just suffixes. Do not confuse it with the suffix trie.",
+ question:"How many distinct substrings does 'banana' have?",
+ answer:"15. The suffix automaton gives this count by summing (len[v] - len[link[v]]) over all states.",
+ demo:"none",sample:"",
+ refs:[["Blumer et al., The smallest automaton recognizing the subwords of a text, TCS 1985","https://doi.org/10.1016/0304-3975(85)90157-4"],["Crochemore and Hancart, Automata for matching patterns, in Handbook of Formal Languages, 1997","https://doi.org/10.1007/978-3-642-59126-6_9"],["cp-algorithms.com, Suffix automaton","https://cp-algorithms.com/string/suffix-automaton.html"]]},
+{id:"fm-index",title:"FM-index and BWT",level:5,kind:"Text index",status:"Concept lesson",
+ summary:"The FM-index combines the Burrows-Wheeler Transform with the suffix array. It supports pattern matching with very little extra memory, making it the basis of compressed full-text search.",
+ mental:"A compressed text index",
+ mentalText:"BWT rearranges the string so similar characters cluster. The FM-index uses this clustering plus two small arrays to find patterns in O(m) time.",
+ steps:["Compute the Burrows-Wheeler Transform of the text.","Build the C array (counts of characters before each position).","Build the Occ array (ranks in the BWT).","Search backward from the last character of the pattern."],
+ pseudo:"Burrows-Wheeler Transform:\n  List all rotations of s\n  Sort them lexicographically\n  Output the last column\n\nFM-index:\n  C[c] = number of characters in s smaller than c\n  Occ(c, i) = number of occurrences of c in BWT[0..i-1]\n\nBackward search:\n  Start with the full range [0, n)\n  For each character of the pattern (right to left):\n    l = C[c] + Occ(c, l)\n    r = C[c] + Occ(c, r)\n  After processing all characters, the range size is the number of matches.\n\nSearch time: O(m)\nSpace: 5n bits per character or less.",
+ uses:"Bioinformatics (BWA, Bowtie), full-text search, data compression, FM-index in modern search engines.",
+ strength:"Very compact. Fast pattern matching. Supports counting and locating.",
+ limits:"Building the index requires the BWT, which is O(n) but with a large constant. Backward search only.",
+ pitfall:"The FM-index is not a drop-in replacement for a suffix array. It gives the same answers but through a different interface.",
+ question:"How does the FM-index achieve such small memory?",
+ answer:"It compresses the BWT and stores only rank and select structures. This gives about n log sigma bits plus a small overhead, versus 4n bytes for a suffix array.",
+ demo:"none",sample:"",
+ refs:[["Ferragina and Manzini, Opportunistic data structures with applications, FOCS 2000","https://doi.org/10.1109/SFCS.2000.892127"],["Burrows and Wheeler, A block-sorting lossless data compression algorithm, SRC 1994","https://www.hpl.hp.com/techreports/Compaq-DEC/SRC-RR-124.html"],["Langmead et al., Ultrafast and memory-efficient alignment of short DNA sequences to the human genome, Genome Biology 2009","https://doi.org/10.1186/gb-2009-10-3-r25"]]},
+{id:"wavelet-trees",title:"Wavelet trees",level:5,kind:"Data structure",status:"Concept lesson",
+ summary:"A wavelet tree is a balanced binary tree over the alphabet. It supports rank, select and range quantile queries in O(log sigma) time with n log sigma bits of space.",
+ mental:"A tree that splits the alphabet in half at each level",
+ mentalText:"At each node, the alphabet is split into two halves. The string is represented by a bitmap that says which half each character belongs to. Recursion continues on each half.",
+ steps:["Build a bitmap at the root: 0 for characters in the lower half, 1 for the upper half.","Recurse on the lower half and upper half.","Rank query: traverse down the tree.","Range quantile: use the bitmap to navigate."],
+ pseudo:"Wavelet tree construction:\n  Build(node, alphabet, string):\n    if alphabet size <= 1: return leaf\n    mid = alphabet size // 2\n    bitmap = for each char: 0 if in lower half, 1 otherwise\n    lower_string = characters mapped to lower half\n    upper_string = characters mapped to upper half\n    recurse on lower and upper\n\nRank of character c up to position i:\n  Traverse from root to the leaf for c.\n  At each node, use the bitmap to compute the new position.\n\nTime: O(log sigma) per query.\nSpace: n log sigma bits.",
+ uses:"Succinct text indexes, range quantile queries, compressed suffix arrays, document retrieval.",
+ strength:"Very compact. Supports many query types in logarithmic time.",
+ limits:"More complex than a plain array. Only useful when the alphabet is small.",
+ pitfall:"Wavelet trees for large alphabets need wavelet matrices or other variations. Do not assume O(n log sigma) is always small.",
+ question:"How much space does a wavelet tree for a 1 GB string over a 256-symbol alphabet take?",
+ answer:"About 1 GB × 8 bits = 8 GB without compression. With rank/select structures and compression it can be much smaller.",
+ demo:"none",sample:"",
+ refs:[["Grossi, Gupta, Vitter, High-order entropy-compressed text indexes, SODA 2003","https://doi.org/10.1145/644108.644250"],["Claude and Navarro, The wavelet matrix, SPIRE 2012","https://doi.org/10.1007/978-3-642-34109-0_15"],["Navarro, Wavelet trees for all, Journal of Discrete Algorithms 2014","https://doi.org/10.1016/j.jda.2013.07.004"]]},
+{id:"dawg-fst",title:"DAWG and finite-state transducers",level:5,kind:"Data structure",status:"Concept lesson",
+ summary:"A DAWG (directed acyclic word graph) is a minimal DFA for a set of words. A finite-state transducer adds output labels to the transitions, supporting string-to-string mapping.",
+ mental:"The smallest automaton for a dictionary",
+ mentalText:"A DAWG is to a trie what a minimal DFA is to an NFA. Common suffixes and prefixes are shared, so the automaton is much smaller.",
+ steps:["Build a trie of the words.","Merge equivalent subtrees bottom-up.","The result is the DAWG.","For an FST, add output labels to transitions."],
+ pseudo:"DAWG construction:\n  Start with a trie.\n  Identify equivalent states (same language below).\n  Merge them.\n\nThe result is the minimal DFA for the set of words.\n\nFinite-state transducer:\n  States + input labels + output labels on transitions.\n  Maps strings to strings.\n  Used for: morphological analysis, machine translation, speech recognition.\n\nLibraries: OpenFst, FOMA, HFST.",
+ uses:"Spell check, word games, morphological analysis, speech and translation, dictionary compression.",
+ strength:"Minimal representation of a set of strings. FSTs are closed under union, concatenation and Kleene star.",
+ limits:"DAWG construction is more complex than a trie. FST composition can blow up in size.",
+ pitfall:"DAWGs are minimal DFAs, so they accept exactly the dictionary. Adding a word may require merging or splitting states.",
+ question:"How is a DAWG different from a trie?",
+ answer:"A DAWG merges equivalent states, so common suffixes are shared. A trie has a node per prefix character with no sharing of suffixes.",
+ demo:"none",sample:"",
+ refs:[["Blumer et al., The smallest automaton recognizing the subwords of a text, TCS 1985","https://doi.org/10.1016/0304-3975(85)90157-4"],["Mohri, Pereira, Riley, Weighted finite-state transducers in speech recognition, Computer Speech and Language 2002","https://doi.org/10.1006/csla.2001.0184"],["OpenFst library documentation","https://www.openfst.org/"]]},
+/* Chapter 6 */
+{id:"b-tree",title:"B-tree",level:4,kind:"Disk index",status:"Runnable teaching lab",
+ summary:"A B-tree is a balanced search tree optimized for disk access. Each node holds many keys so that the height stays small and the number of disk reads is minimized.",
+ mental:"A wide, short tree",
+ mentalText:"Instead of two children per node, a B-tree node holds hundreds of keys and hundreds of children. This makes the tree very wide and very short.",
+ steps:["Each node holds up to 2t-1 keys and 2t children for a parameter t.","Insert: find the leaf, insert, split if too many keys.","Delete: find the key, remove, merge or borrow if too few.","Search: descend from the root comparing keys."],
+ pseudo:"B-tree of order m (m-way tree):\n  - every node has at most m children\n  - every node except the root has at least ceil(m/2) children\n  - the root has at least 2 children if it is not a leaf\n  - all leaves are at the same depth\n  - a node with k children has k-1 keys\n\nSearch: descend from the root\nInsert: split on the way down if needed\nDelete: borrow or merge on the way up\n\nTime: O(log_m n) disk reads.",
+ uses:"Database indexes (SQLite, MySQL InnoDB, PostgreSQL), file systems (NTFS, HFS+, Btrfs), key-value stores.",
+ strength:"Very few disk reads. Every operation is O(log n) with a small constant for the disk-friendly factor.",
+ limits:"Complex to implement. Not efficient for in-memory use, where B-trees have more overhead than binary trees.",
+ pitfall:"The choice of order t matters. Too small gives a tall tree. Too large wastes memory in each node.",
+ question:"How many disk reads does a B-tree search need for 1 billion keys with an order of 1000?",
+ answer:"About 3 disk reads. log_1000(10^9) = 3.",
+ demo:"b-tree",sample:"10, 20, 5, 6, 12, 30, 7, 17",
+ refs:[["Bayer and McCreight, Organization and maintenance of large ordered indices, Acta Informatica 1972","https://doi.org/10.1007/BF00288683"],["Comer, The ubiquitous B-tree, ACM Computing Surveys 1979","https://doi.org/10.1145/356770.356776"],["Knuth, TAOCP Vol. 3, Section 6.2.4","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["SQLite documentation on B-trees","https://www.sqlite.org/fileformat2.html"]]},
+{id:"b-plus-tree",title:"B+ tree",level:4,kind:"Disk index",status:"Runnable teaching lab",
+ summary:"A B+ tree stores all keys in the leaves and uses internal nodes as a router. The leaves are linked, which makes range queries efficient. Every database index uses a variant of this.",
+ mental:"A B-tree where only the leaves hold data",
+ mentalText:"Internal nodes just say which leaf to go to. All data lives in the leaves. Leaves are connected, so you can scan a range quickly.",
+ steps:["Internal nodes hold only keys and pointers, not data.","All data is in the leaves.","Leaves are linked in order.","Insert: split the leaf, update internal keys.","Range query: descend to the first leaf, then follow the links."],
+ pseudo:"B+ tree of order m:\n  - internal nodes: m-1 keys, m pointers\n  - leaves: hold data entries, m-1 entries, linked list\n  - all leaves at the same depth\n\nSearch: descend from root using keys in internal nodes\nRange query:\n  1. Descend to the first leaf with keys >= low\n  2. Follow the leaf links until the last leaf with keys <= high\n\nInsert: split the leaf, propagate the split key up\nDelete: merge or borrow to maintain minimum occupancy\n\nTime: O(log_m n) for point queries, O(log_m n + k) for range queries.",
+ uses:"Almost every database index (MySQL InnoDB, PostgreSQL, Oracle, SQL Server, SQLite), file systems.",
+ strength:"Excellent for both point and range queries. Sequential leaf scan uses disk prefetching efficiently.",
+ limits:"More nodes than a B-tree because internal nodes store only keys. The leaf linked list uses extra pointers.",
+ pitfall:"The linked list of leaves must be maintained on split and merge. Getting this wrong breaks range queries.",
+ question:"Why is a B+ tree better than a B-tree for database indexes?",
+ answer:"Range queries are much faster because the leaves are linked. Point queries are about the same speed. This is why B+ trees dominate database indexing.",
+ demo:"b-plus-tree",sample:"10, 20, 5, 6, 12, 30, 7, 17",
+ refs:[["Comer, The ubiquitous B-tree, ACM Computing Surveys 1979","https://doi.org/10.1145/356770.356776"],["Bayer and McCreight, Organization and maintenance of large ordered indices, Acta Informatica 1972","https://doi.org/10.1007/BF00288683"],["PostgreSQL documentation on B-tree indexes","https://www.postgresql.org/docs/current/indexes-types.html"]]},
+{id:"b-epsilon-tree",title:"B-epsilon tree",level:5,kind:"Disk index",status:"Concept lesson",
+ summary:"A B-epsilon tree is a B-tree that buffers writes at internal nodes. This makes insertions much faster, which is critical for write-heavy workloads.",
+ mental:"A B-tree that collects writes in buckets",
+ mentalText:"Instead of pushing every write to a leaf, the tree stores writes in internal node buffers. When a buffer fills, it is flushed down.",
+ steps:["Insert a key at the root buffer.","When the root buffer fills, flush it to children.","Each internal node has a buffer for pending writes.","Leaves hold the actual data."],
+ pseudo:"B-epsilon tree:\n  Each internal node holds a buffer of pending insertions and deletions.\n\n  Insert:\n    Add the key to the root buffer.\n    If the buffer is full: flush it to children.\n\n  Flush:\n    Sort the buffer entries by child subtree.\n    Push each group into the corresponding child buffer.\n    If the child buffer is full: recurse.\n\nInsert cost: O(log_epsilon n) amortized\nSearch cost: O(log n) plus one buffer per level\n\nTrade-off: faster inserts, slightly slower searches.",
+ uses:"Write-heavy database indexes (TokuDB, MongoDB WiredTiger, modern LSM-adjacent indexes), file systems.",
+ strength:"Insertions are much faster than a plain B-tree. Good for write-intensive workloads.",
+ limits:"Searches are slightly slower because they must check each node's buffer.",
+ pitfall:"The epsilon parameter controls the trade-off. Small epsilon means large buffers and faster writes but slower searches.",
+ question:"What does the epsilon parameter control in a B-epsilon tree?",
+ answer:"It controls the buffer size relative to the node size. A larger buffer means faster inserts but slower searches.",
+ demo:"none",sample:"",
+ refs:[["Brodal and Fagerberg, Lower bounds for external memory dictionaries, SODA 2003","https://doi.org/10.5555/644108.644242"],["Bender, Farach-Colton, Fineman, Fogel, Kuszmaul, Nelson, Cache-oblivious streaming B-trees, SPAA 2007","https://doi.org/10.1145/1248377.1248387"],["TokuDB and WiredTiger documentation on write-optimized trees","https://www.mongodb.com/docs/manual/core/wiredtiger/"]]},
+{id:"isam",title:"ISAM (Indexed Sequential Access Method)",level:3,kind:"Disk index",status:"Concept lesson",
+ summary:"ISAM is a disk storage method that combines sequential access with an index. It was the predecessor to the B-tree and was widely used in mainframe databases.",
+ mental:"A card catalog with overflow drawers",
+ mentalText:"Primary records are stored in sorted order. An index points to the main file. When records overflow the main file, they go into overflow areas.",
+ steps:["Store records in sorted order on disk.","Build a top-level index of the sorted ranges.","Insert new records in overflow areas.","Periodically reorganize to absorb the overflow."],
+ pseudo:"ISAM structure:\n  - Main file: sorted records, one per block\n  - Index: dense or sparse, maps key ranges to blocks\n  - Overflow: unsorted blocks for new records\n\n  Insert: add to overflow\n  Search: check main file via index, then scan overflow\n  Reorganize: merge overflow into main file\n\nThis is a static index. The main file structure does not change.",
+ uses:"Legacy mainframe databases (IBM VSAM), some file systems, CD-ROM indexing.",
+ strength:"Simple and efficient for read-mostly workloads.",
+ limits:"Degrades with many insertions. Requires periodic reorganization.",
+ pitfall:"ISAM is not the same as B-tree. ISAM is static, B-tree is dynamic. Modern databases use B-trees.",
+ question:"Why did B-trees replace ISAM?",
+ answer:"B-trees handle insertions and deletions without a separate overflow area. ISAM degrades with many updates because the overflow grows.",
+ demo:"none",sample:"",
+ refs:[["Knuth, TAOCP Vol. 3, Section 6.2.3 Balanced trees and ISAM","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["IBM documentation, VSAM (Virtual Storage Access Method)","https://www.ibm.com/docs/en/zos/2.4.0?topic=vsam-virtual-storage-access-method"],["Comer, The ubiquitous B-tree, ACM Computing Surveys 1979","https://doi.org/10.1145/356770.356776"]]},
+{id:"inverted-index",title:"Inverted index",level:3,kind:"Text index",status:"Runnable teaching lab",
+ summary:"An inverted index maps each term to the list of documents (and positions) where it appears. It is the core data structure behind all full-text search engines.",
+ mental:"The index at the back of a book",
+ mentalText:"Instead of scanning every document for a term, look it up in the index. The index says which documents contain the term, and often where.",
+ steps:["Tokenize each document into terms.","For each term, append the document ID to the term's posting list.","Optionally store positions for phrase queries.","At query time, look up each term and intersect or union the posting lists."],
+ pseudo:"Inverted index construction:\n  for doc_id, doc in enumerate(documents):\n    tokens = tokenize(doc)\n    for pos, term in enumerate(tokens):\n      postings[term].append((doc_id, pos))\n\nQuery processing (AND):\n  result = postings[t1]\n  for term in remaining_terms:\n    result = intersect(result, postings[term])\n\nPosting list intersection:\n  Use galloping search or skip pointers for efficiency.\n\nStorage: O(total terms across all documents).",
+ uses:"Every search engine: Google, Bing, Elasticsearch, Lucene, Solr, Whoosh, Sphinx.",
+ strength:"Fast term lookup. Supports AND, OR, NOT, phrase and proximity queries.",
+ limits:"The index can be as large as the corpus. Stemming and stop word removal are lossy.",
+ pitfall:"Tokenization choices have a huge impact on results. Case folding, stemming and stop words must match user expectations.",
+ question:"How does an inverted index make search fast?",
+ answer:"It looks up each term in a hash table or sorted list. The posting list for each term is short and can be intersected quickly. Full corpus scan is avoided.",
+ demo:"inverted-index",sample:"the quick brown fox\nthe lazy dog\nquick brown dog\n\nquick brown",
+ refs:[["Manning, Raghavan, Schutze, Introduction to Information Retrieval, Chapter 1 and 2","https://nlp.stanford.edu/IR-book/"],["Zobel and Moffat, Inverted files for text search engines, ACM Computing Surveys 2006","https://doi.org/10.1145/1132956.1132959"],["Apache Lucene documentation","https://lucene.apache.org/core/"]]},
+{id:"learned-indexes",title:"Learned indexes",level:5,kind:"Modern index",status:"Concept lesson",
+ summary:"A learned index replaces the B-tree with a model that predicts the position of a key. The model is trained on the sorted key distribution.",
+ mental:"Predicting where the key is instead of searching",
+ mentalText:"If the keys follow a predictable distribution, a model can guess the position directly. The model is much smaller than a B-tree index.",
+ steps:["Train a model to predict the position of a key in the sorted array.","At lookup, use the model to predict the position.","Search locally around the predicted position.","The search is O(1) if the model is accurate."],
+ pseudo:"Learned index (recursive model index):\n  Level 0: root model predicts a position\n  Level 1: models refine the prediction\n  Level 2: local model or binary search\n\n  Lookup(key):\n    pos = model.predict(key)\n    search A[pos - delta : pos + delta] for key\n\n  Training: fit the model to the cumulative distribution\n  of the sorted keys.\n\nBest case: O(1) lookup with a small model.\nWorst case: degrades to binary search.",
+ uses:"Modern database indexes (Google BigQuery, Amazon Aurora), in-memory key-value stores, string dictionaries.",
+ strength:"Can be much smaller and faster than a B-tree when keys follow a predictable distribution.",
+ limits:"Requires training. Degrades on adversarial or uniform distributions. Updates require retraining or local correction.",
+ pitfall:"Learned indexes are not a drop-in replacement for B-trees. The workload must match the training distribution.",
+ question:"When does a learned index beat a B-tree?",
+ answer:"When the keys are stored in a predictable order (for example timestamps or sequential IDs) and the workload is read-heavy.",
+ demo:"none",sample:"",
+ refs:[["Kraska, Beutel, Chi, Dean, Polyzotis, The case for learned index structures, SIGMOD 2018","https://doi.org/10.1145/3183713.3196909"],["Ferragina and Vinciguerra, The PGM-index: a fully-dynamic compressed learned index, PVLDB 2020","https://doi.org/10.14778/3389133.3389135"],["Ding et al., ALEX: an updatable adaptive learned index, SIGMOD 2020","https://doi.org/10.1145/3318464.3389711"]]},
+/* Chapter 7 */
+{id:"edit-distance",title:"Edit distance and Levenshtein distance",level:3,kind:"Fuzzy search",status:"Runnable teaching lab",
+ summary:"Edit distance counts the minimum number of single-character insertions, deletions and substitutions needed to transform one string into another. It is the foundation of spell check and fuzzy matching.",
+ mental:"Counting how many keystrokes would fix the typo",
+ mentalText:"If you typed 'kitten' instead of 'sitting', how many edits fix it? Two substitutions and one insertion: three edits.",
+ steps:["Build a table of size (m+1) by (n+1).","Initialize the first row and column to 0, 1, 2, ...","For each cell, compute the cost: match (0) or mismatch (1), plus the minimum of three moves.","The bottom-right cell holds the edit distance."],
+ pseudo:"Levenshtein distance (dynamic programming):\n  dp[i][j] = distance between A[0..i) and B[0..j)\n\n  dp[0][j] = j\n  dp[i][0] = i\n\n  for i = 1 to m:\n    for j = 1 to n:\n      cost = 0 if A[i-1] == B[j-1] else 1\n      dp[i][j] = min(\n        dp[i-1][j] + 1,      # delete\n        dp[i][j-1] + 1,      # insert\n        dp[i-1][j-1] + cost  # substitute\n      )\n\n  return dp[m][n]\n\nTime: O(m n)\nSpace: O(min(m, n)) with rolling rows.",
+ uses:"Spell check, autocorrect, fuzzy string matching, DNA alignment, plagiarism detection, record linkage.",
+ strength:"Simple, correct and well understood.",
+ limits:"O(m n) is too slow for long strings. Use bit-parallel methods or banded DP for speed.",
+ pitfall:"Levenshtein distance is symmetric. But the optimal alignment may differ depending on the direction. For asymmetric costs, use a weighted version.",
+ question:"What is the edit distance between 'kitten' and 'sitting'?",
+ answer:"3. Two substitutions (k to s, e to i) plus one insertion (g at the end).",
+ demo:"edit-distance",sample:"kitten\nsitting",
+ refs:[["Levenshtein, Binary codes capable of correcting deletions, insertions and reversals, Soviet Physics Doklady 1966","https://www.sciencedirect.com/science/article/abs/pii/S0019995866803774"],["Navarro, A guided tour to approximate string matching, ACM Computing Surveys 2001","https://doi.org/10.1145/375360.375365"],["Wikipedia, Levenshtein distance","https://en.wikipedia.org/wiki/Levenshtein_distance"]]},
+{id:"bk-tree",title:"BK-tree",level:4,kind:"Fuzzy search",status:"Runnable teaching lab",
+ summary:"A BK-tree indexes strings by their edit distance. Each node stores a string and its children are labelled by the distance. This makes fuzzy lookup much faster than scanning.",
+ mental:"A tree sorted by how far each string is",
+ mentalText:"The root holds a string. Each child is at a specific distance. When you search with a radius k, you only visit nodes with distance in [d - k, d + k].",
+ steps:["Build: insert each string, finding the child with the same distance.","Search: compute the distance from the query to the current node.","If the distance is <= k, add the node to the results.","Recurse into children with distance in [d - k, d + k]."],
+ pseudo:"BK-tree insert(string):\n  if tree is empty: root = string\n  else:\n    node = root\n    while True:\n      d = edit_distance(string, node.string)\n      if d == 0: return\n      if d not in node.children: node.children[d] = new node\n      node = node.children[d]\n\nBK-tree search(query, k):\n  results = []\n  def visit(node, k):\n    if node is None: return\n    d = edit_distance(query, node.string)\n    if d <= k: results.append(node.string)\n    for dist, child in node.children.items():\n      if d - k <= dist <= d + k:\n        visit(child, k)\n  visit(root, k)\n  return results",
+ uses:"Spell check, fuzzy name matching, search suggestions, error correction.",
+ strength:"Much faster than linear scan when k is small.",
+ limits:"Memory-heavy for large dictionaries. Build time is O(n log n) edit distance computations.",
+ pitfall:"The BK-tree metric property is essential. Edit distance is a metric, so the triangle inequality holds. If your distance is not a metric, the BK-tree is wrong.",
+ question:"How does the BK-tree prune the search?",
+ answer:"If the query has distance d to a node, any string in a child with edge distance e has distance at least |d - e| to the query. If |d - e| > k, the subtree can be skipped.",
+ demo:"bk-tree",sample:"apple\napply\napples\nbanana\nbandana\nband\n\naple\n2",
+ refs:[["Burkhard and Keller, Some approaches to best-match file searching, CACM 1973","https://doi.org/10.1145/362003.362025"],["Baeza-Yates and Navarro, Fast approximate string matching in a dictionary, SPIRE 1998","https://doi.org/10.1109/SPIRE.1998.712978"],["Wikipedia, BK-tree","https://en.wikipedia.org/wiki/BK-tree"]]},
+{id:"levenshtein-automata",title:"Levenshtein automata",level:5,kind:"Fuzzy search",status:"Concept lesson",
+ summary:"A Levenshtein automaton recognizes all strings within a given edit distance of a fixed pattern. It turns fuzzy matching into an automaton traversal, which can be very fast.",
+ mental:"An automaton that accepts all typos within k edits",
+ mentalText:"Given a word and a distance k, build an automaton that accepts any string within k edits of the word. Then run the automaton over the dictionary.",
+ steps:["Build the NFA: states represent positions in the pattern and edit distance.","Apply the subset construction to get a DFA (for bounded k).","Run the DFA over the text.","Every match is a string within k edits."],
+ pseudo:"Levenshtein NFA:\n  State (i, e) means: at pattern position i, used e edits.\n  Transitions:\n    match: (i, e) -> (i+1, e) if input == pattern[i]\n    substitute: (i, e) -> (i+1, e+1)\n    insert: (i, e) -> (i, e+1)     (any input)\n    delete: (i, e) -> (i+1, e+1)   (empty input)\n\nFor fixed small k, the DFA has O(m) states and can be built in O(m) time.\n\nSearch time: O(n) per automaton run.",
+ uses:"Spell check in Lucene, Elasticsearch fuzzy search, autocorrect, error-tolerant pattern matching.",
+ strength:"Very fast matching once the automaton is built. Handles any query in linear time.",
+ limits:"Building the DFA is expensive for large k. For k > 3, use NFA simulation or non-deterministic Levenshtein automata.",
+ pitfall:"The DFA size grows exponentially with k. For k > 3, use non-deterministic simulation or Levenshtein automata with a different construction.",
+ question:"Why does Lucene use Levenshtein automata for fuzzy search?",
+ answer:"The automaton can be intersected with the term index efficiently. This makes fuzzy search fast even on large dictionaries.",
+ demo:"none",sample:"",
+ refs:[["Schulz and Mihov, Fast string correction with Levenshtein automata, IJDAR 2002","https://doi.org/10.1007/s10032-002-0082-8"],["Wu and Manber, Fast text searching allowing errors, CACM 1992","https://doi.org/10.1145/135239.135242"],["Lucene fuzzy query documentation","https://lucene.apache.org/core/9_0_0/core/org/apache/lucene/search/FuzzyQuery.html"]]},
+{id:"symspell",title:"SymSpell",level:4,kind:"Fuzzy search",status:"Runnable teaching lab",
+ summary:"SymSpell uses the symmetric delete spelling correction algorithm. It pre-computes all strings within edit distance 1 and stores them in a hash table for O(1) lookup.",
+ mental:"Pre-computing all possible typos",
+ mentalText:"For each dictionary word, generate all strings within edit distance 1 (by deleting one character). Store them in a hash table. At query time, look up the query directly.",
+ steps:["For each dictionary word, generate all strings with one character deleted.","Store each generated string in a hash table with a reference to the original.","At query time, generate all strings with one deletion from the query.","Look up each in the hash table and collect candidates."],
+ pseudo:"SymSpell indexing:\n  for word in dictionary:\n    for edit in deletes(word):\n      index[edit].append(word)\n\n  deletes(word) returns all strings with one character deleted.\n\nSymSpell lookup(query, max_edits=2):\n  candidates = set()\n  for edit in deletes(query):\n    candidates.update(index.get(edit, []))\n  for edit in deletes_recursive(query, max_edits):\n    candidates.update(index.get(edit, []))\n  rank candidates by edit distance to query\n  return top k",
+ uses:"Spell check, autocorrect, query correction in search engines, name matching.",
+ strength:"Extremely fast lookup (O(1) for edit distance 1). Simple to implement.",
+ limits:"Memory grows quickly with max_edits. Index size is roughly proportional to word length.",
+ pitfall:"For edit distance 2, you need to generate two levels of deletions. The index can become very large.",
+ question:"How does SymSpell achieve O(1) lookup?",
+ answer:"It pre-computes all one-deletion variants of dictionary words and stores them in a hash table. The query is also reduced to its deletions, so lookup is a hash table access.",
+ demo:"symspell",sample:"apple\napply\napples\nbanana\nbandana\nband\n\naple\n2",
+ refs:[["Garbe, SymSpell: Symmetric Delete Spelling Correction Algorithm","https://github.com/wolfgarbe/SymSpell"],["Norvig, How to Write a Spelling Corrector, 2007","https://norvig.com/spell-correct.html"],["Manning, Raghavan, Schutze, Introduction to Information Retrieval, Chapter 3","https://nlp.stanford.edu/IR-book/"]]},
+{id:"soundex-metaphone",title:"Soundex and Metaphone",level:3,kind:"Phonetic matching",status:"Runnable teaching lab",
+ summary:"Soundex and Metaphone encode words by their pronunciation. Two words that sound the same encode to the same value, enabling phonetic matching.",
+ mental:"Encoding words by how they sound",
+ mentalText:"Smith, Smyth and Smithe all encode to the same Soundex code. This lets you match names despite spelling differences.",
+ steps:["Soundex: keep the first letter, drop vowels and H, W, Y.","Soundex: map consonants to digits.","Soundex: keep the first three digits after the first letter.","Metaphone: apply more rules for English pronunciation."],
+ pseudo:"Soundex encoding:\n  1. Keep the first letter\n  2. Drop a, e, i, o, u, h, w, y (except the first)\n  3. Map consonants to digits:\n     b, f, p, v -> 1\n     c, g, j, k, q, s, x, z -> 2\n     d, t -> 3\n     l -> 4\n     m, n -> 5\n     r -> 6\n  4. Collapse adjacent identical digits\n  5. Pad with zeros or truncate to 4 characters\n\nExample:\n  Smith  -> S530\n  Smyth  -> S530\n  Smithe -> S530\n  Schneider -> S536",
+ uses:"Name matching, genealogy, census records, de-duplication, phonetic search.",
+ strength:"Very fast. Simple to implement. Handles common misspellings.",
+ limits:"Tuned to English. Does not handle non-English names well. Many collisions.",
+ pitfall:"Soundex is only good for English names. For other languages use a different phonetic algorithm or a general fuzzy match.",
+ question:"What is the Soundex code for Robert and Rupert?",
+ answer:"Both are R163. They share the same consonants and vowels in the same positions.",
+ demo:"soundex",sample:"Smith\nSmyth\nSmithe\nSchneider\nRobert\nRupert",
+ refs:[["Knuth, TAOCP Vol. 3, Section 6.4 Soundex","https://www-cs-faculty.stanford.edu/~knuth/taocp.html"],["Christen, A comparison of personal name matching, 2006","https://doi.org/10.1109/ICDMW.2006.2"],["Apache Commons Codec, Soundex and Metaphone","https://commons.apache.org/proper/commons-codec/"]]},
+/* Chapter 8 */
+{id:"kd-tree",title:"k-d tree",level:4,kind:"Spatial index",status:"Runnable teaching lab",
+ summary:"A k-d tree recursively splits space along alternating axes. It supports nearest-neighbour search in low dimensions efficiently.",
+ mental:"Dividing space with axis-aligned cuts",
+ mentalText:"At each level, split the points by one axis at the median. Recurse on the left and right halves. Search by pruning branches that cannot contain a closer point.",
+ steps:["Sort points by the current axis.","Choose the median as the split.","Recurse on the left and right halves with the next axis.","Search: descend into the branch containing the query, then check the other branch if it might contain a closer point."],
+ pseudo:"k-d tree construction:\n  build(points, depth):\n    if points is empty: return None\n    axis = depth mod k\n    sort points by axis\n    median = middle of points\n    node.point = median\n    node.left = build(left half, depth + 1)\n    node.right = build(right half, depth + 1)\n    return node\n\nNearest neighbour search:\n  best = None, best_dist = infinity\n  search(node, query):\n    if node is None: return\n    d = distance(query, node.point)\n    if d < best_dist: best = node.point; best_dist = d\n    axis = node.axis\n    if query[axis] < node.point[axis]:\n      search(node.left, query)\n      if query[axis] + best_dist > node.point[axis]: search(node.right, query)\n    else:\n      search(node.right, query)\n      if query[axis] - best_dist < node.point[axis]: search(node.left, query)\n\nWorst-case: O(n) in high dimensions (curse of dimensionality).",
+ uses:"Nearest-neighbour search, computer graphics (ray tracing), clustering, classification, point location.",
+ strength:"Fast for low-dimensional data (d < 20). Exact, not approximate.",
+ limits:"Curse of dimensionality: performance degrades to linear scan in high dimensions.",
+ pitfall:"A k-d tree is not a good choice for high-dimensional data. Use a different index or approximate search.",
+ question:"Why does a k-d tree slow down in high dimensions?",
+ answer:"In high dimensions, the pruning criterion rarely helps. Almost every point must be checked. This is the curse of dimensionality.",
+ demo:"kd-tree",sample:"2 3\n5 4\n9 6\n4 7\n8 1\n7 2\n\n5 5",
+ refs:[["Bentley, Multidimensional binary search trees used for associative searching, CACM 1975","https://doi.org/10.1145/361002.361007"],["Friedman, Bentley, Finkel, An algorithm for finding best matches in logarithmic expected time, ACM TOMS 1977","https://doi.org/10.1145/355744.355745"],["Samet, Foundations of Multidimensional and Metric Data Structures, Morgan Kaufmann 2006","https://www.sciencedirect.com/book/9780123694461/foundations-of-multidimensional-and-metric-data-structures"]]},
+{id:"ball-tree",title:"Ball tree",level:4,kind:"Metric index",status:"Concept lesson",
+ summary:"A ball tree partitions points into nested hyperspheres. It works with any metric, not just Euclidean, and is more efficient than k-d trees for high dimensions.",
+ mental:"Nested balls of points",
+ mentalText:"Instead of axis-aligned splits, a ball tree groups points into balls. Each ball has a centre and a radius. Search prunes balls that are too far.",
+ steps:["Pick the two points furthest apart.","Split the remaining points between the two.","Each child is a ball containing its points.","Recurse until each leaf is small.","Search: descend into the ball containing the query, check the other if within radius + best distance."],
+ pseudo:"Ball tree construction:\n  build(points):\n    if points is small: return leaf\n    (a, b) = two points furthest apart\n    L = points closer to a\n    R = points closer to b\n    node.center = centroid\n    node.radius = max distance from center\n    node.left = build(L)\n    node.right = build(R)\n    return node\n\nSearch:\n  distance from query to ball center d\n  if d - radius > best_dist: prune\n  else: recurse",
+ uses:"Nearest-neighbour search in high dimensions, anomaly detection, clustering, metric learning.",
+ strength:"Works with any metric. Better than k-d tree in high dimensions.",
+ limits:"Construction is more expensive than k-d tree. Still suffers from curse of dimensionality for very high dimensions.",
+ pitfall:"The ball tree requires a true metric. Non-metric distances break the pruning.",
+ question:"When is a ball tree better than a k-d tree?",
+ answer:"When the dimension is high enough that k-d tree pruning stops working. The ball tree handles dimensions up to about 50 well.",
+ demo:"none",sample:"",
+ refs:[["Omohundro, Five balltree construction algorithms, ICSI 1989","https://www.icsi.berkeley.edu/techreports/1989/tr-89-063.pdf"],["Liu, Moore, Gray, New algorithms for efficient high-dimensional nonparametric classification, JMLR 2006","https://jmlr.org/papers/v7/liu06a.html"],["scikit-learn BallTree documentation","https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.BallTree.html"]]},
+{id:"vp-tree",title:"VP-tree (vantage point tree)",level:4,kind:"Metric index",status:"Concept lesson",
+ summary:"A VP-tree partitions points by their distance to a vantage point. The inner set is closer than a threshold; the outer set is further. Works with any metric.",
+ mental:"A tree sorted by distance to a special point",
+ mentalText:"Pick a point. Everything closer than the median distance goes left. Everything further goes right. Recurse.",
+ steps:["Pick a vantage point.","Compute distances from all points to it.","Choose the median distance as the threshold.","Inner set goes left, outer set goes right.","Search: compare query distance to the vantage point with the threshold."],
+ pseudo:"VP-tree construction:\n  build(points):\n    vp = pick a point (vantage point)\n    mu = median distance from vp to all points\n    L = points with d(vp, p) <= mu\n    R = points with d(vp, p) > mu\n    node.vp = vp\n    node.mu = mu\n    node.left = build(L)\n    node.right = build(R)\n\nSearch:\n  d = distance(query, vp)\n  if d < mu:\n    search left\n    if d + r >= mu: search right\n  else:\n    search right\n    if d - r <= mu: search left",
+ uses:"Nearest-neighbour search with arbitrary metrics, similarity search, image matching.",
+ strength:"Works with any metric. Simpler than ball tree.",
+ limits:"Like all metric trees, degrades in very high dimensions.",
+ pitfall:"The choice of vantage point matters. Random selection is typical but a good heuristic can improve performance.",
+ question:"What is the difference between a VP-tree and a ball tree?",
+ answer:"The VP-tree uses one vantage point and a distance threshold. The ball tree uses two centres and their balls. Both are for arbitrary metrics.",
+ demo:"none",sample:"",
+ refs:[["Yianilos, Data structures and algorithms for nearest neighbor search in general metric spaces, SODA 1993","https://doi.org/10.1145/313559.313789"],["Samet, Foundations of Multidimensional and Metric Data Structures, Morgan Kaufmann 2006","https://www.sciencedirect.com/book/9780123694461/foundations-of-multidimensional-and-metric-data-structures"],["Chavez et al., Searching in metric spaces, ACM Computing Surveys 2001","https://doi.org/10.1145/502807.502808"]]},
+{id:"hnsw",title:"HNSW (Hierarchical Navigable Small World)",level:5,kind:"Approximate NN",status:"Concept lesson",
+ summary:"HNSW is a graph-based index for approximate nearest-neighbour search. It builds a hierarchy of navigable small-world graphs and searches from the top down.",
+ mental:"A graph where each node has shortcuts to far-away nodes",
+ mentalText:"The top layer has few nodes with long connections. Lower layers have more nodes with shorter connections. Search starts at the top and descends.",
+ steps:["Assign each point a maximum layer using a geometric distribution.","Insert each point into all layers up to its maximum.","Connect to the M nearest neighbours at each layer.","Search: start at the top layer, greedily move to the closest node, descend."],
+ pseudo:"HNSW construction:\n  for each point:\n    level = floor(-log(random()) * mL)\n    for l from level down to 0:\n      find M nearest neighbours at layer l\n      add bidirectional edges\n\nSearch:\n  ep = entry point at top layer\n  for l from top down to 0:\n    greedy walk from ep to closest node at layer l\n  return closest node at layer 0\n\nComplexity: O(log n) expected for search.\nRecall can be tuned by ef parameter.",
+ uses:"Vector search in databases (Pinecone, Weaviate, Milvus, Qdrant, FAISS), image search, recommendation.",
+ strength:"Very high recall with sublinear query time. State-of-the-art for high-dimensional approximate NN.",
+ limits:"Memory-intensive. Construction is slower than IVF. Parameter tuning matters.",
+ pitfall:"The M parameter controls graph connectivity. Too small and recall drops. Too large and memory blows up.",
+ question:"What is the advantage of HNSW over a k-d tree for high-dimensional data?",
+ answer:"HNSW scales to millions of points in hundreds of dimensions. A k-d tree degrades to linear scan in high dimensions.",
+ demo:"none",sample:"",
+ refs:[["Malkov and Yashunin, Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs, IEEE TPAMI 2018","https://doi.org/10.1109/TPAMI.2018.2889473"],["Malkov et al., Approximate nearest neighbor algorithm based on navigable small world graphs, Information Systems 2014","https://doi.org/10.1016/j.is.2013.10.006"],["Faiss library documentation","https://github.com/facebookresearch/faiss/wiki"]]},
+{id:"ivf-annoy",title:"IVF and Annoy",level:5,kind:"Approximate NN",status:"Concept lesson",
+ summary:"IVF (inverted file index) clusters points and searches only the closest clusters. Annoy builds a forest of random projection trees and searches multiple trees.",
+ mental:"Cluster first, then search nearby clusters only",
+ mentalText:"IVF groups points into clusters. Search only the clusters closest to the query. Annoy does something similar but with random projection trees.",
+ steps:["IVF: cluster the dataset with k-means.","IVF: assign each point to its nearest cluster.","IVF: at query time, find the nprobe nearest clusters.","Annoy: build multiple random projection trees.","Annoy: search each tree and merge results."],
+ pseudo:"IVF (Inverted File Index):\n  Train k-means on the dataset -> k centroids\n  Assign each point to nearest centroid (inverted list)\n  Query:\n    Find nprobe nearest centroids to query\n    Search the inverted lists of those centroids\n\nTrade-off: nprobe controls recall vs speed.\n\nAnnoy (Approximate Nearest Neighbors Oh Yeah):\n  Build many random projection trees\n  Each tree partitions space by random hyperplanes\n  Query:\n    Search each tree for the closest leaf\n    Merge results by distance",
+ uses:"Large-scale vector search (FAISS, Annoy, ScaNN), recommendation, image retrieval, deduplication.",
+ strength:"IVF is very fast for billions of vectors. Annoy is memory-efficient and supports on-disk indexes.",
+ limits:"Both are approximate. Recall depends on the number of clusters probed or trees searched.",
+ pitfall:"IVF requires training. The clustering quality directly affects recall. Annoy is best for read-only workloads.",
+ question:"When would you use IVF over HNSW?",
+ answer:"When the dataset is very large (billions of vectors) and memory is a concern. IVF is more memory-efficient than HNSW.",
+ demo:"none",sample:"",
+ refs:[["Jegou, Douze, Schmid, Product quantization for nearest neighbor search, IEEE TPAMI 2011","https://doi.org/10.1109/TPAMI.2010.57"],["Bernhardsson, Annoy library","https://github.com/spotify/annoy"],["Johnson, Douze, Jegou, Billion-scale similarity search with GPUs, IEEE Trans. Big Data 2019","https://doi.org/10.1109/TBDATA.2019.2921572"]]},
+{id:"scann-diskann",title:"ScaNN and DiskANN",level:5,kind:"Modern ANN",status:"Concept lesson",
+ summary:"ScaNN (Google) uses anisotropic vector quantization and score-aware quantization loss. DiskANN (Microsoft) keeps the graph on SSD and only the compressed vectors in memory.",
+ mental:"Smarter quantization and disk-based graphs",
+ mentalText:"ScaNN learns the quantization to align with the inner product. DiskANN keeps the graph on disk, so it can handle billions of vectors with modest RAM.",
+ steps:["ScaNN: train a quantizer that minimizes the error in the MIPS score.","ScaNN: use the quantizer to compress vectors.","DiskANN: build a graph index but store it on SSD.","DiskANN: cache only the compressed vectors in memory."],
+ pseudo:"ScaNN (anisotropic vector quantization):\n  Learn a quantization where the loss is the MIPS score error,\n  not the Euclidean reconstruction error.\n  Partition the space with k-means.\n  Store compressed residuals.\n\nDiskANN (Vamana graph):\n  Build a graph with short and long edges.\n  Store the graph on SSD.\n  Keep PQ-compressed vectors in memory.\n  Query: traverse the graph, load neighbour lists from SSD on demand.\n\n  Handles billions of vectors on a single machine.",
+ uses:"Google search, YouTube recommendations, Microsoft Bing, Azure Cognitive Search, large-scale vector databases.",
+ strength:"ScaNN is state-of-the-art in recall vs speed. DiskANN scales to billions with modest RAM.",
+ limits:"Both are complex. ScaNN needs training. DiskANN needs fast SSDs.",
+ pitfall:"ScaNN and DiskANN are not drop-in replacements for HNSW. They solve different scale and hardware constraints.",
+ question:"Why does DiskANN put the graph on SSD?",
+ answer:"The graph for billions of vectors does not fit in RAM. SSD keeps the full graph while compressed vectors stay in memory for fast distance computations.",
+ demo:"none",sample:"",
+ refs:[["Guo et al., Accelerating large-scale inference with anisotropic vector quantization, ICML 2020","https://arxiv.org/abs/1908.10396"],["Subramanya et al., DiskANN: fast accurate billion-point nearest neighbor search on a single node, NeurIPS 2019","https://papers.nips.cc/paper/2019/hash/09853c7fb1d3f8ee67a61b6bf4a7f8e6-Abstract.html"],["Sun et al., SOAR: improved indexing for approximate nearest-neighbor search, NeurIPS 2023","https://arxiv.org/abs/2312.02909"]]},
+/* Chapter 9 */
+{id:"product-quantization",title:"Product quantization",level:5,kind:"Vector compression",status:"Runnable teaching lab",
+ summary:"Product quantization splits a vector into subspaces and quantizes each subspace with its own codebook. It compresses vectors by 10 to 100 times with modest accuracy loss.",
+ mental:"Cutting a vector into pieces and quantizing each piece",
+ mentalText:"Split a 128-dimensional vector into 16 pieces of 8 dimensions. Quantize each piece with a small codebook. Store the codebook indices.",
+ steps:["Split each vector into M subvectors of dimension D/M.","Run k-means on each subspace to learn a codebook of K centroids.","For each subvector, find the nearest centroid.","Store the M centroid indices."],
+ pseudo:"Product quantization:\n  Split D-dimensional vector into M subvectors of dimension D/M.\n  For each subspace, train K centroids (typically K = 256).\n  For each subvector, find the nearest centroid.\n  Store the M indices (M bytes for K = 256).\n\nCompression:\n  Original: D * 4 bytes (float32)\n  PQ: M bytes\n  Example: 128-dim float32 (512 bytes) -> 16 bytes (32x compression).\n\nDistance computation:\n  Precompute distances from query subvector to each centroid.\n  Sum the precomputed distances for the M subvectors.\n  This is the asymmetric distance computation (ADC).",
+ uses:"FAISS, billions of vectors, memory-efficient nearest-neighbour search, image retrieval.",
+ strength:"Very compact. Fast distance computation via lookup tables.",
+ limits:"Accuracy loss. The codebooks must be trained. Higher compression means worse accuracy.",
+ pitfall:"PQ works best with uniform subspaces. If the vector has structure that does not split evenly, the quantization is poor.",
+ question:"How much does PQ compress a 128-dimensional float32 vector with M = 16 and K = 256?",
+ answer:"From 512 bytes to 16 bytes, a 32x compression.",
+ demo:"pq",sample:"1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0\n2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0\n1.5 2.5 3.5 4.5 5.5 6.5 7.5 8.5\n0.5 1.5 2.5 3.5 4.5 5.5 6.5 7.5\n3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0",
+ refs:[["Jegou, Douze, Schmid, Product quantization for nearest neighbor search, IEEE TPAMI 2011","https://doi.org/10.1109/TPAMI.2010.57"],["Ge, He, Ke, Sun, Optimized product quantization, CVPR 2013","https://doi.org/10.1109/CVPR.2013.379"],["Faiss PQ documentation","https://github.com/facebookresearch/faiss/wiki/Faiss-indexes"]]},
+{id:"scalar-quantization",title:"Scalar quantization",level:4,kind:"Vector compression",status:"Runnable teaching lab",
+ summary:"Scalar quantization quantizes each component of a vector independently. It is simpler than product quantization but less compact.",
+ mental:"Rounding each number to a small number of buckets",
+ mentalText:"For each dimension, find the min and max. Divide the range into 256 buckets. Store the bucket index for each component.",
+ steps:["Compute the min and max of each dimension over the dataset.","Divide each dimension's range into K buckets.","Store the bucket index for each component.","Decompress by using the bucket centre."],
+ pseudo:"Scalar quantization:\n  For each dimension d:\n    min_d = min over all vectors of x[d]\n    max_d = max over all vectors of x[d]\n    bucket_width = (max_d - min_d) / K\n    code[v][d] = floor((x[d] - min_d) / bucket_width)\n\nCompression:\n  Original: D * 4 bytes\n  Quantized: D * 1 byte (K = 256)\n  4x compression.\n\nDistance:\n  Approximate by using bucket centres.",
+ uses:"Vector databases, embeddings compression, LLM KV cache compression (int8, int4).",
+ strength:"Simple. Fast. Good for 4x to 8x compression.",
+ limits:"Less compact than PQ. Accuracy depends on the bucket count.",
+ pitfall:"Scalar quantization does not exploit correlations between dimensions. PQ does, so PQ compresses better for the same accuracy.",
+ question:"What is the difference between scalar and product quantization?",
+ answer:"Scalar quantization treats each dimension independently. Product quantization groups dimensions into subspaces and quantizes jointly, which captures correlations.",
+ demo:"scalar-q",sample:"1.0 2.0 3.0 4.0\n2.0 3.0 4.0 5.0\n1.5 2.5 3.5 4.5\n0.5 1.5 2.5 3.5\n3.0 4.0 5.0 6.0",
+ refs:[["Gong et al., Compressing deep convolutional networks using vector quantization, 2014","https://arxiv.org/abs/1412.6115"],["Jacob et al., Quantization and training of neural networks for efficient integer-arithmetic-only inference, CVPR 2018","https://arxiv.org/abs/1712.05877"],["Wikipedia, Quantization (signal processing)","https://en.wikipedia.org/wiki/Quantization_(signal_processing)"]]},
+{id:"lsh",title:"Locality-sensitive hashing",level:5,kind:"Approximate search",status:"Runnable teaching lab",
+ summary:"LSH hashes similar items into the same bucket with high probability. It turns approximate nearest-neighbour search into a hash table lookup.",
+ mental:"A hash function that keeps similar items close",
+ mentalText:"Unlike a normal hash that spreads items randomly, LSH wants similar items to collide. The hash function depends on the distance measure.",
+ steps:["Choose an LSH family for your distance measure.","Build multiple hash tables with random hash functions.","Insert each item into the buckets.","Query by hashing and looking up candidates in the same buckets."],
+ pseudo:"Random hyperplane LSH for cosine similarity:\n  For each hash function, pick a random unit vector w.\n  hash(x) = sign(w . x)   (1 bit)\n  Concatenate k such bits for a bucket key.\n\n  Pr[hash(a) = hash(b)] = 1 - angle(a, b) / pi\n\n  Build L hash tables with independent random w vectors.\n  Query:\n    For each table, look up the query's bucket.\n    Collect candidates, rank by exact distance.\n\nFor Euclidean distance, use p-stable LSH.\nFor Jaccard similarity, use MinHash.",
+ uses:"Near-duplicate detection, image similarity, document similarity, fast approximate nearest-neighbour search, recommendation.",
+ strength:"Sublinear query time. Theoretically grounded.",
+ limits:"Requires many hash tables for high recall. Memory-intensive.",
+ pitfall:"LSH is approximate. The probability of finding the nearest neighbour depends on the number of hash tables.",
+ question:"What is the probability that two vectors with angle 60 degrees collide under random hyperplane LSH?",
+ answer:"1 - 60/180 = 0.667. About two-thirds of the time.",
+ demo:"lsh",sample:"1.0 2.0 3.0\n2.0 3.0 4.0\n10.0 11.0 12.0\n1.1 2.1 3.1\n11.0 12.0 13.0\n\n1.0 2.0 3.0",
+ refs:[["Indyk and Motwani, Approximate nearest neighbors: towards removing the curse of dimensionality, STOC 1998","https://doi.org/10.1145/276698.276876"],["Charikar, Similarity estimation techniques from rounding algorithms, STOC 2002","https://doi.org/10.1145/509907.509965"],["Leskovec, Rajaraman, Ullman, Mining of Massive Datasets, Chapter 3","http://www.mmds.org/"]]},
+{id:"reranking-hybrid",title:"Reranking and hybrid search",level:4,kind:"Retrieval pipeline",status:"Concept lesson",
+ summary:"A two-stage retrieval pipeline uses a fast approximate index for the first pass and an expensive exact model to rerank a small candidate set. Hybrid search combines keyword and vector retrieval.",
+ mental:"A fast filter, then a careful sort",
+ mentalText:"Stage 1 gets thousands of candidates fast. Stage 2 scores them accurately and returns the top 10.",
+ steps:["Stage 1: retrieve top K candidates with ANN or BM25.","Stage 2: rerank the K candidates with a cross-encoder or exact distance.","Combine scores from multiple signals with reciprocal rank fusion.","Return the top N."],
+ pseudo:"Two-stage retrieval:\n  candidates = ANN_index.search(query, top_k=1000)\n  reranked = cross_encoder.rank(query, candidates)\n  return reranked[:10]\n\nHybrid search:\n  keyword_results = BM25.search(query, top_k=100)\n  vector_results = ANN.search(query, top_k=100)\n  combined = reciprocal_rank_fusion(keyword_results, vector_results)\n  return combined[:10]\n\nReciprocal rank fusion:\n  score(d) = sum over rankers of 1 / (k + rank_r(d))\n  with k = 60 as a common default.",
+ uses:"Modern search engines, RAG pipelines, e-commerce search, recommendation, question answering.",
+ strength:"Combines the speed of approximate retrieval with the accuracy of exact scoring.",
+ limits:"Two stages add complexity. The candidate set must contain the true best answer for the pipeline to work.",
+ pitfall:"If the first stage misses the correct answer, no reranker can recover it. Recall of stage 1 is the ceiling.",
+ question:"Why is reranking necessary in a modern search pipeline?",
+ answer:"Bi-encoders are fast but less accurate than cross-encoders. Reranking lets you get the speed of the first stage and the accuracy of the second.",
+ demo:"none",sample:"",
+ refs:[["Nogueira and Cho, Passage re-ranking with BERT, 2019","https://arxiv.org/abs/1901.04085"],["Cormack, Clarke, Buettcher, Reciprocal rank fusion outperforms condorcet and individual rank learning methods, SIGIR 2009","https://doi.org/10.1145/1571941.1572114"],["Karpukhin et al., Dense passage retrieval for open-domain question answering, EMNLP 2020","https://arxiv.org/abs/2004.04906"]]},
+/* Chapter 10 */
+{id:"eytzinger-van-emde",title:"Eytzinger and van Emde Boas layouts",level:5,kind:"Memory layout",status:"Runnable teaching lab",
+ summary:"The Eytzinger layout stores a binary search tree in breadth-first order. The van Emde Boas layout uses a recursive divide-and-conquer structure to minimize cache misses.",
+ mental:"Reordering the array so searches are cache friendly",
+ mentalText:"If you search a sorted array, the access pattern jumps around. Reordering the elements so that the tree is stored breadth-first makes searches faster.",
+ steps:["Build the implicit search tree from the sorted array.","Store the nodes in breadth-first order for Eytzinger.","For van Emde Boas, split the tree into top and bottom halves recursively.","Search using the same tree structure but with cache-friendly memory access."],
+ pseudo:"Eytzinger layout:\n  Tree stored in BFS order:\n    index 1: root (median)\n    index 2: left child\n    index 3: right child\n    index 4-7: grandchildren\n  Search:\n    i = 1\n    while i < n:\n      i = 2*i + (A[i] < target ? 1 : 0)\n    return A[i // 2]\n\nVan Emde Boas layout:\n  Recursively store the top half of the tree, then each bottom subtree.\n  Memory: each subtree fits in a cache line.\n  Search: O(log log n) cache misses.",
+ uses:"In-memory search indexes, database indexes, sorted arrays with cache-friendly layout.",
+ strength:"Cache-friendly. 2 to 5 times faster than a plain sorted array for large data.",
+ limits:"Requires the array to fit in memory. Building is O(n).",
+ pitfall:"Eytzinger and van Emde Boas are cache optimizations, not algorithmic ones. They do not change the O(log n) complexity.",
+ question:"Why does the Eytzinger layout speed up binary search?",
+ answer:"The tree structure matches the access pattern. Each level of the tree fits in one cache line, so the memory prefetcher can hide latency.",
+ demo:"eytzinger",sample:"10, 20, 30, 40, 50, 60, 70, 80, 90, 100\n40",
+ refs:[["Khuong and Morin, Array layouts for comparison-based searching, ACM JEA 2017","https://doi.org/10.1145/3053370"],["Bender, Demaine, Farach-Colton, Cache-oblivious B-trees, FOCS 2000","https://doi.org/10.1109/SFCS.2000.892128"],["Brodal, Fagerberg, Jacob, Cache-oblivious search trees via binary trees of small height, SODA 2002","https://doi.org/10.1145/545381.545385"]]},
+{id:"zorder-hilbert",title:"Z-order and Hilbert curves",level:4,kind:"Space-filling curve",status:"Runnable teaching lab",
+ summary:"Z-order and Hilbert curves map multidimensional points to a single dimension while preserving locality. They are used for spatial indexes and database range queries.",
+ mental:"Snaking through the grid to assign a single number",
+ mentalText:"You have a 2D grid. Snaking through it in a specific order gives each cell a unique 1D number. Neighbours in the grid are close in the 1D order.",
+ steps:["For Z-order, interleave the bits of the coordinates.","For Hilbert, recursively rotate and reflect the grid.","Use the 1D value as an index key.","Query by scanning ranges of the 1D key."],
+ pseudo:"Z-order (Morton code):\n  For point (x, y) with 32-bit coordinates:\n    Interleave the bits: xyxyxy...\n    Result is a 64-bit integer.\n\n  Example: (0b101, 0b110) -> 0b110110 = 54\n\nHilbert curve:\n  Recursively:\n    Split the square into 4 quadrants.\n    Assign each quadrant a specific rotation and reflection.\n    Recurse into each quadrant.\n  Result: 1D index with strong locality.\n\nBoth are used in spatial databases (PostGIS, MongoDB), image processing, and cache-friendly matrix traversal.",
+ uses:"Spatial databases, quadtrees, R-trees, image tiling, matrix traversal, LSH for spatial data.",
+ strength:"Preserves locality. Simple bit manipulation for Z-order.",
+ limits:"Hilbert has better locality than Z-order but is more complex. Neither is a metric.",
+ pitfall:"Z-order has discontinuities at the edges of the grid. Hilbert has better locality but is slower to compute.",
+ question:"What is the main difference between Z-order and Hilbert curves?",
+ answer:"Hilbert has better locality (adjacent points in 1D are always close in 2D). Z-order has some jumps but is faster to compute.",
+ demo:"zorder",sample:"0 0\n1 1\n2 2\n3 3\n0 3\n3 0",
+ refs:[["Morton, A computer oriented geodetic data base and a new technique in file sequencing, IBM 1966","https://domino.research.ibm.com/library/cyberdig.nsf/papers/0DABF9473B9C86D48525779800566A39"],["Hilbert, Uber die stetige Abbildung einer Linie auf ein Flachenstuck, Math. Ann. 1891","https://doi.org/10.1007/BF01199431"],["Lawder and King, Using space-filling curves for multi-dimensional indexing, BNCOD 2000","https://doi.org/10.1007/3-540-45033-0_3"]]},
+{id:"geohash-s2-h3",title:"Geohash, S2 and H3",level:5,kind:"Geospatial index",status:"Runnable teaching lab",
+ summary:"Geohash, S2 and H3 encode geographic coordinates into hierarchical cell IDs. They are used for spatial indexing, proximity search and map tiling.",
+ mental:"Cutting the globe into nested squares or hexagons",
+ mentalText:"Each system divides the globe into cells, then subdivides each cell into smaller cells. The ID of a cell tells you its parent and its location.",
+ steps:["Geohash: interleave latitude and longitude, then base32 encode.","S2: project the sphere to a cube, then subdivide the face recursively.","H3: project to a sphere, then tile with hexagons at multiple resolutions.","Query: compute the cell ID of the query point and its neighbours."],
+ pseudo:"Geohash:\n  Latitude and longitude in [-90, 90] and [-180, 180].\n  Interleave the bits of lat and lon.\n  Encode as base32.\n  Longer strings are more precise (each character is a subdivision).\n\nS2:\n  Project the sphere to 6 cube faces.\n  Each face is subdivided into 2^30 cells.\n  Cell ID is a 64-bit integer.\n  Used by Google Maps, BigQuery, MongoDB.\n\nH3:\n  Tiles the sphere with hexagons.\n  16 resolutions.\n  Each cell has 7 children on average.\n  Used by Uber, H3 library.",
+ uses:"Geospatial search, map tiling, ride sharing, location-based recommendations, geographic deduplication.",
+ strength:"Hierarchical and compact. Fast prefix matching for neighbor queries.",
+ limits:"Different systems have different trade-offs. Geohash has cell shape distortion at high latitudes. S2 and H3 are spherical but more complex.",
+ pitfall:"Geohash uses a rectangle on the lat/lon grid. Near the poles the cells are very distorted. Use S2 or H3 for global accuracy.",
+ question:"How does Geohash encode higher precision?",
+ answer:"Each added character subdivides the cell. A 4-character Geohash is about 39 km by 19 km. A 10-character Geohash is about 1 m by 1 m.",
+ demo:"geohash",sample:"37.7749\n-122.4194\n8",
+ refs:[["Niemeyer, Geohash, 2008","http://geohash.org/"],["S2 Geometry library documentation","https://s2geometry.io/"],["Uber H3 library documentation","https://h3geo.org/docs/"]]},
+{id:"wand-lambdamart",title:"WAND and LambdaMART",level:5,kind:"Ranked retrieval",status:"Concept lesson",
+ summary:"WAND is a dynamic pruning algorithm for posting list intersection. LambdaMART is a learning-to-rank method that optimizes ranking metrics directly.",
+ mental:"Skipping posting lists that cannot beat the current top and learning the best ranking function",
+ mentalText:"WAND uses upper bounds on posting list contributions to skip lists that cannot make it into the top k. LambdaMART learns the ranking function from click data.",
+ steps:["WAND: compute the upper bound for each term.","WAND: process posting lists in order of upper bound.","WAND: skip lists whose maximum contribution cannot beat the current top-k.","LambdaMART: define a lambda gradient from pairwise preferences.","LambdaMART: train gradient boosted trees to optimize NDCG."],
+ pseudo:"WAND (Weak AND):\n  For each term in the query, compute the upper bound of its contribution.\n  Sort posting lists by document ID.\n  Maintain a threshold (the k-th best score so far).\n  Pick the list with the smallest doc ID whose upper bound\n  could exceed the threshold.\n  If the sum of upper bounds for this document < threshold: skip.\n  Otherwise, fully evaluate the document.\n\nLambdaMART:\n  For each query, have a set of documents with relevance labels.\n  Compute lambda gradients for each document pair.\n  Train a gradient boosted tree ensemble on the lambdas.\n  Objective: maximize NDCG or another ranking metric.",
+ uses:"Web search engines (BM25 + WAND), recommender systems, ad ranking, question answering.",
+ strength:"WAND is a fast exact top-k algorithm for inverted indexes. LambdaMART learns from real user data.",
+ limits:"WAND needs upper bounds. LambdaMART needs training data (clicks or labels).",
+ pitfall:"WAND's upper bound must be valid. If the scoring function changes, the upper bound must be recomputed.",
+ question:"Why is WAND important for search engines?",
+ answer:"It turns an O(n) posting list scan into a dynamic skip that processes only documents that could be in the top k. This is a big speedup for long queries on large indexes.",
+ demo:"none",sample:"",
+ refs:[["Broder et al., Efficient query evaluation using a two-level retrieval process, CIKM 2003","https://doi.org/10.1145/956863.956944"],["Burges, Learning to rank with Nonsmooth Cost Functions (LambdaMART), NIPS 2010","https://papers.nips.cc/paper/2006/hash/3cf166c6b73f030b4f67eeaeba301103-Abstract.html"],["Ding et al., WAND and Block-Max WAND documentation in Lucene","https://lucene.apache.org/core/"]]}
+];
+
+const LESSONS=RAW.map(mk);
+const byId=Object.fromEntries(LESSONS.map(x=>[x.id,x]));
+
+/* ============================================================
+   Code examples
+   ============================================================ */
+const CODE={
+ "linear-search":{python:`def linear_search(A, x):\n    for i, v in enumerate(A):\n        if v == x:\n            return i\n    return -1\n\n\nA = [10, 20, 30, 40, 50, 60, 70, 80]\nprint(linear_search(A, 40))\nprint(linear_search(A, 45))\n`},
+ "binary-search":{python:`def binary_search(A, x):\n    low, high = 0, len(A) - 1\n    while low <= high:\n        mid = low + (high - low) // 2\n        if A[mid] == x:\n            return mid\n        if A[mid] < x:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1\n\n\nimport bisect\nA = [10, 20, 30, 40, 50, 60, 70, 80]\nprint(binary_search(A, 40))\nprint(bisect.bisect_left(A, 40))\n`},
+ "ternary-search":{python:`def ternary_max(f, low, high, iterations=200):\n    for _ in range(iterations):\n        if high - low < 1e-9:\n            break\n        m1 = low + (high - low) / 3\n        m2 = high - (high - low) / 3\n        if f(m1) < f(m2):\n            low = m1\n        else:\n            high = m2\n    return (low + high) / 2\n\n\n# Example: unimodal function with peak at 3\nf = lambda x: -(x - 3) ** 2 + 10\nprint(ternary_max(f, 0, 10))\n`},
+ "interp-exp":{python:`def interpolation_search(A, x):\n    low, high = 0, len(A) - 1\n    while low <= high and A[low] <= x <= A[high]:\n        if A[high] == A[low]:\n            return low if A[low] == x else -1\n        pos = low + ((x - A[low]) * (high - low)) // (A[high] - A[low])\n        if A[pos] == x:\n            return pos\n        if A[pos] < x:\n            low = pos + 1\n        else:\n            high = pos - 1\n    return -1\n\n\ndef exponential_search(A, x):\n    n = len(A)\n    if A[0] == x: return 0\n    bound = 1\n    while bound < n and A[bound] < x:\n        bound *= 2\n    import bisect\n    idx = bisect.bisect_left(A, x, bound // 2, min(bound + 1, n))\n    return idx if idx < n and A[idx] == x else -1\n\n\nA = list(range(0, 1000, 10))\nprint(interpolation_search(A, 700))\nprint(exponential_search(A, 700))\n`},
+ "lower-upper":{python:`import bisect\n\nA = [1, 3, 3, 3, 5, 7]\nprint("lower_bound of 3:", bisect.bisect_left(A, 3))\nprint("upper_bound of 3:", bisect.bisect_right(A, 3))\nprint("equal range:", bisect.bisect_left(A, 3), bisect.bisect_right(A, 3))\n\n# C++ equivalent\n# auto lo = std::lower_bound(A.begin(), A.end(), 3);\n# auto hi = std::upper_bound(A.begin(), A.end(), 3);\n`},
+ "monotonic":{python:`def smallest_x_cube_at_least(n):\n    def predicate(x):\n        return x ** 3 >= n\n    low, high = 1, n\n    while low < high:\n        mid = (low + high) // 2\n        if predicate(mid):\n            high = mid\n        else:\n            low = mid + 1\n    return low\n\n\nprint(smallest_x_cube_at_least(1000))\nprint(smallest_x_cube_at_least(999999999))\n`},
+ "hash-lookup":{python:`class ChainHashTable:\n    def __init__(self, m=11):\n        self.m = m\n        self.buckets = [[] for _ in range(m)]\n\n    def _hash(self, k):\n        return hash(k) % self.m\n\n    def insert(self, k, v):\n        self.buckets[self._hash(k)].append((k, v))\n\n    def lookup(self, k):\n        for key, val in self.buckets[self._hash(k)]:\n            if key == k:\n                return val\n        raise KeyError(k)\n\n\nht = ChainHashTable()\nfor word in "apple banana cherry date elderberry fig".split():\n    ht.insert(word, len(word))\nprint(ht.lookup("cherry"))\n`},
+ "skip-list":{python:`import random\n\n\nclass Node:\n    def __init__(self, key, level):\n        self.key = key\n        self.next = [None] * (level + 1)\n\n\nclass SkipList:\n    def __init__(self, p=0.5, max_level=16):\n        self.p = p\n        self.max_level = max_level\n        self.head = Node(None, max_level)\n\n    def _random_level(self):\n        level = 0\n        while random.random() < self.p and level < self.max_level:\n            level += 1\n        return level\n\n    def insert(self, key):\n        level = self._random_level()\n        node = Node(key, level)\n        update = [None] * (max(level, self.max_level) + 1)\n        current = self.head\n        for i in range(self.max_level, -1, -1):\n            while current.next[i] and current.next[i].key < key:\n                current = current.next[i]\n            update[i] = current\n        for i in range(level + 1):\n            node.next[i] = update[i].next[i]\n            update[i].next[i] = node\n\n    def search(self, key):\n        current = self.head\n        for i in range(self.max_level, -1, -1):\n            while current.next[i] and current.next[i].key < key:\n                current = current.next[i]\n        return current.next[0] and current.next[0].key == key\n\n\nsl = SkipList()\nfor v in [10, 30, 50, 70, 90]:\n    sl.insert(v)\nprint(sl.search(50), sl.search(45))\n`},
+ "trie":{python:`class TrieNode:\n    __slots__ = ("children", "is_end")\n    def __init__(self):\n        self.children = {}\n        self.is_end = False\n\n\nclass Trie:\n    def __init__(self):\n        self.root = TrieNode()\n\n    def insert(self, word):\n        node = self.root\n        for ch in word:\n            node = node.children.setdefault(ch, TrieNode())\n        node.is_end = True\n\n    def search(self, word):\n        node = self.root\n        for ch in word:\n            if ch not in node.children:\n                return False\n            node = node.children[ch]\n        return node.is_end\n\n    def starts_with(self, prefix):\n        node = self.root\n        for ch in prefix:\n            if ch not in node.children:\n                return False\n            node = node.children[ch]\n        return True\n\n\nt = Trie()\nfor word in ["apple", "app", "apply", "banana"]:\n    t.insert(word)\nprint(t.search("apple"), t.search("appl"))\nprint(t.starts_with("app"))\n`},
+ "radix-trie":{python:`class RadixNode:\n    def __init__(self, prefix="", is_end=False):\n        self.prefix = prefix\n        self.is_end = is_end\n        self.children = {}\n\n\nclass RadixTrie:\n    def __init__(self):\n        self.root = RadixNode()\n\n    def insert(self, word):\n        node = self.root\n        i = 0\n        while i < len(word):\n            ch = word[i]\n            if ch in node.children:\n                child = node.children[ch]\n                j = 0\n                while j < len(child.prefix) and i + j < len(word) and child.prefix[j] == word[i + j]:\n                    j += 1\n                if j < len(child.prefix):\n                    # split the child\n                    rest = RadixNode(child.prefix[j:], child.is_end)\n                    rest.children = child.children\n                    child.prefix = child.prefix[:j]\n                    child.is_end = False\n                    child.children = {rest.prefix[0]: rest}\n                i += j\n                node = child\n            else:\n                new_node = RadixNode(word[i:], True)\n                node.children[ch] = new_node\n                return\n        node.is_end = True\n\n    def search(self, word):\n        node = self.root\n        i = 0\n        while i < len(word):\n            if word[i] not in node.children:\n                return False\n            node = node.children[word[i]]\n            if word[i:i + len(node.prefix)] != node.prefix:\n                return False\n            i += len(node.prefix)\n        return node.is_end\n\n\nr = RadixTrie()\nfor w in ["apple", "apply", "banana"]:\n    r.insert(w)\nprint(r.search("apple"), r.search("appl"))\n`},
+ "tst":{python:`class TSTNode:\n    __slots__ = ("char", "left", "mid", "right", "is_end")\n    def __init__(self, ch):\n        self.char = ch\n        self.left = self.mid = self.right = None\n        self.is_end = False\n\n\nclass TST:\n    def __init__(self):\n        self.root = None\n\n    def _insert(self, node, word, i):\n        ch = word[i]\n        if node is None:\n            node = TSTNode(ch)\n        if ch < node.char:\n            node.left = self._insert(node.left, word, i)\n        elif ch > node.char:\n            node.right = self._insert(node.right, word, i)\n        else:\n            if i + 1 == len(word):\n                node.is_end = True\n            else:\n                node.mid = self._insert(node.mid, word, i + 1)\n        return node\n\n    def insert(self, word):\n        self.root = self._insert(self.root, word, 0)\n\n    def search(self, word):\n        node = self.root\n        i = 0\n        while node is not None and i < len(word):\n            if word[i] < node.char:\n                node = node.left\n            elif word[i] > node.char:\n                node = node.right\n            else:\n                i += 1\n                if i == len(word):\n                    return node.is_end\n                node = node.mid\n        return False\n\n\nt = TST()\nfor w in ["apple", "app", "banana"]:\n    t.insert(w)\nprint(t.search("apple"), t.search("appl"))\n`},
+ "suffix-array":{python:`def build_suffix_array(s):\n    n = len(s)\n    suffixes = sorted(range(n), key=lambda i: s[i:])\n    return suffixes\n\n\ndef search_suffix_array(s, sa, pattern):\n    import bisect\n    n = len(s)\n    low, high = 0, n\n    while low < high:\n        mid = (low + high) // 2\n        suffix = s[sa[mid]:sa[mid] + len(pattern)]\n        if suffix < pattern:\n            low = mid + 1\n        else:\n            high = mid\n    if low < n and s[sa[low]:sa[low] + len(pattern)] == pattern:\n        return sa[low]\n    return -1\n\n\ns = "banana"\nsa = build_suffix_array(s)\nprint("suffix array:", sa)\nprint("search 'ana':", search_suffix_array(s, sa, "ana"))\n`},
+ "b-tree":{python:`# Simplified B-tree of order 4 (max 3 keys per node)\nclass BTreeNode:\n    def __init__(self, leaf=True):\n        self.keys = []\n        self.children = []\n        self.leaf = leaf\n\n\nclass BTree:\n    def __init__(self, t=2):\n        self.t = t  # minimum degree\n        self.root = BTreeNode()\n\n    def search(self, node, key):\n        i = 0\n        while i < len(node.keys) and key > node.keys[i]:\n            i += 1\n        if i < len(node.keys) and node.keys[i] == key:\n            return node, i\n        if node.leaf:\n            return None\n        return self.search(node.children[i], key)\n\n\nbt = BTree(t=2)\nbt.root.keys = [10, 20, 30]\nleaf1 = BTreeNode()\nleaf1.keys = [5, 7]\nleaf2 = BTreeNode()\nleaf2.keys = [15, 17]\nleaf3 = BTreeNode()\nleaf3.keys = [25, 27]\nleaf4 = BTreeNode()\nleaf4.keys = [35, 37]\nbt.root.children = [leaf1, leaf2, leaf3, leaf4]\nbt.root.leaf = False\n\nprint(bt.search(bt.root, 17))\n`},
+ "b-plus-tree":{python:`# Conceptual B+ tree sketch\n# In production, use a real library.\n# The key properties:\n#   - all data in leaves\n#   - leaves linked\n#   - internal nodes only route\n\nclass BPlusNode:\n    def __init__(self, leaf=True):\n        self.keys = []\n        self.children = []\n        self.next_leaf = None\n        self.leaf = leaf\n\n# Search descends to leaf, then follows links for range queries.\n# Insert splits leaves and propagates the split key up.\n# Delete merges leaves and pulls keys down if needed.\n\nprint("B+ tree nodes hold up to m-1 keys, m children.")\nprint("Every leaf is at the same depth.")\nprint("Leaves form a sorted linked list.")\n`},
+ "inverted-index":{python:`from collections import defaultdict\n\n\ndef build_inverted_index(docs):\n    index = defaultdict(list)\n    for doc_id, doc in enumerate(docs):\n        for term in doc.lower().split():\n            index[term].append(doc_id)\n    return index\n\n\ndef search_and(index, terms):\n    result = set(index.get(terms[0], []))\n    for term in terms[1:]:\n        result &= set(index.get(term, []))\n    return sorted(result)\n\n\ndocs = [\n    "the quick brown fox",\n    "the lazy dog",\n    "quick brown dog",\n]\nidx = build_inverted_index(docs)\nprint("index:", dict(idx))\nprint("AND (quick, brown):", search_and(idx, ["quick", "brown"]))\n`},
+ "edit-distance":{python:`def levenshtein(a, b):\n    m, n = len(a), len(b)\n    prev = list(range(n + 1))\n    for i in range(1, m + 1):\n        curr = [i] + [0] * n\n        for j in range(1, n + 1):\n            cost = 0 if a[i - 1] == b[j - 1] else 1\n            curr[j] = min(\n                prev[j] + 1,\n                curr[j - 1] + 1,\n                prev[j - 1] + cost,\n            )\n        prev = curr\n    return prev[n]\n\n\nprint(levenshtein("kitten", "sitting"))\nprint(levenshtein("apple", "apply"))\n`},
+ "bk-tree":{python:`def edit_distance(a, b):\n    m, n = len(a), len(b)\n    prev = list(range(n + 1))\n    for i in range(1, m + 1):\n        curr = [i] + [0] * n\n        for j in range(1, n + 1):\n            cost = 0 if a[i - 1] == b[j - 1] else 1\n            curr[j] = min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost)\n        prev = curr\n    return prev[n]\n\n\nclass BKNode:\n    def __init__(self, word):\n        self.word = word\n        self.children = {}\n\n\ndef insert(root, word):\n    if root is None:\n        return BKNode(word)\n    d = edit_distance(word, root.word)\n    if d == 0:\n        return root\n    if d not in root.children:\n        root.children[d] = BKNode(word)\n    else:\n        insert(root.children[d], word)\n    return root\n\n\ndef search(node, query, k, results=None):\n    if results is None:\n        results = []\n    d = edit_distance(query, node.word)\n    if d <= k:\n        results.append((d, node.word))\n    for dist, child in node.children.items():\n        if d - k <= dist <= d + k:\n            search(child, query, k, results)\n    return results\n\n\nroot = None\nfor word in ["apple", "apply", "apples", "banana", "band", "bandana"]:\n    root = insert(root, word)\nprint(search(root, "aple", 2))\n`},
+ "symspell":{python:`def deletes(word, max_edits=1):\n    results = {word}\n    for _ in range(max_edits):\n        new = set()\n        for w in results:\n            for i in range(len(w)):\n                new.add(w[:i] + w[i + 1:])\n        results |= new\n    return results\n\n\ndef build_index(words):\n    index = {}\n    for word in words:\n        for d in deletes(word, 1):\n            index.setdefault(d, []).append(word)\n    return index\n\n\ndef correct(query, index):\n    candidates = set()\n    for d in deletes(query, 2):\n        candidates.update(index.get(d, []))\n    return candidates\n\n\nwords = ["apple", "apply", "apples", "banana", "band", "bandana"]\nindex = build_index(words)\nprint(correct("aple", index))\n`},
+ "soundex":{python:`def soundex(name):\n    if not name:\n        return ""\n    name = name.upper()\n    codes = {\n        **{c: "1" for c in "BFPV"},\n        **{c: "2" for c in "CGJKQSXZ"},\n        **{c: "3" for c in "DT"},\n        **{c: "4" for c in "L"},\n        **{c: "5" for c in "MN"},\n        **{c: "6" for c in "R"},\n    }\n    first = name[0]\n    tail = name[1:]\n    encoded = []\n    prev = codes.get(first, "")\n    for ch in tail:\n        code = codes.get(ch, "")\n        if code and code != prev:\n            encoded.append(code)\n            prev = code\n        elif not code:\n            prev = ""\n    return (first + "".join(encoded) + "000")[:4]\n\n\nfor name in ["Smith", "Smyth", "Smithe", "Robert", "Rupert"]:\n    print(name, "->", soundex(name))\n`},
+ "kd-tree":{python:`import math\n\n\nclass KDNode:\n    def __init__(self, point, axis, left=None, right=None):\n        self.point = point\n        self.axis = axis\n        self.left = left\n        self.right = right\n\n\ndef build(points, depth=0):\n    if not points:\n        return None\n    k = len(points[0])\n    axis = depth % k\n    points = sorted(points, key=lambda p: p[axis])\n    mid = len(points) // 2\n    return KDNode(\n        points[mid], axis,\n        build(points[:mid], depth + 1),\n        build(points[mid + 1:], depth + 1),\n    )\n\n\ndef nearest(node, query, best=None):\n    if node is None:\n        return best\n    d = math.dist(query, node.point)\n    if best is None or d < best[0]:\n        best = (d, node.point)\n    axis = node.axis\n    first, second = (node.left, node.right) if query[axis] < node.point[axis] else (node.right, node.left)\n    best = nearest(first, query, best)\n    if best is None or abs(query[axis] - node.point[axis]) < best[0]:\n        best = nearest(second, query, best)\n    return best\n\n\npoints = [(2, 3), (5, 4), (9, 6), (4, 7), (8, 1), (7, 2)]\nroot = build(points)\nprint(nearest(root, (5, 5)))\n`},
+ "pq":{python:`import numpy as np\n\n\ndef product_quantize(vectors, M=2, K=4):\n    n, D = vectors.shape\n    D_sub = D // M\n    quantized = np.zeros((n, M), dtype=int)\n    codebooks = []\n    for m in range(M):\n        sub = vectors[:, m * D_sub : (m + 1) * D_sub]\n        # Simple k-means-like assignment to K centroids\n        centroids = sub[np.random.choice(n, K, replace=False)]\n        for _ in range(20):\n            distances = np.linalg.norm(sub[:, None, :] - centroids[None, :, :], axis=2)\n            labels = distances.argmin(axis=1)\n            for k in range(K):\n                if (labels == k).any():\n                    centroids[k] = sub[labels == k].mean(axis=0)\n        codebooks.append(centroids)\n        quantized[:, m] = labels\n    return quantized, codebooks\n\n\nvectors = np.random.randn(20, 8)\nquantized, codebooks = product_quantize(vectors, M=2, K=4)\nprint("Original shape:", vectors.shape)\nprint("Quantized shape:", quantized.shape)\nprint("Compression:", vectors.nbytes / quantized.nbytes, "x")\n`},
+ "scalar-q":{python:`import numpy as np\n\n\ndef scalar_quantize(vectors, K=16):\n    d = vectors.shape[1]\n    mins = vectors.min(axis=0)\n    maxs = vectors.max(axis=0)\n    widths = (maxs - mins) / (K - 1)\n    widths[widths == 0] = 1\n    codes = ((vectors - mins) / widths).round().astype(np.uint8)\n    return codes, mins, widths\n\n\ndef dequantize(codes, mins, widths):\n    return codes * widths + mins\n\n\nvectors = np.random.randn(10, 4)\ncodes, mins, widths = scalar_quantize(vectors, K=16)\nreconstructed = dequantize(codes, mins, widths)\nprint("Original dtype:", vectors.dtype, "size:", vectors.nbytes, "bytes")\nprint("Quantized dtype:", codes.dtype, "size:", codes.nbytes, "bytes")\nprint("Max error:", np.abs(vectors - reconstructed).max())\n`},
+ "lsh":{python:`import numpy as np\n\n\ndef random_hyperplane_lsh(vectors, k=4):\n    n, d = vectors.shape\n    planes = np.random.randn(k, d)\n    planes /= np.linalg.norm(planes, axis=1, keepdims=True)\n    signs = (vectors @ planes.T > 0).astype(int)\n    # Hash = tuple of signs\n    return [tuple(row) for row in signs]\n\n\nvectors = np.array([\n    [1.0, 2.0, 3.0],\n    [2.0, 3.0, 4.0],\n    [10.0, 11.0, 12.0],\n    [1.1, 2.1, 3.1],\n])\nhashes = random_hyperplane_lsh(vectors, k=8)\nfor i, h in enumerate(hashes):\n    print(i, h)\n`},
+ "eytzinger":{python:`def eytzinger_layout(sorted_array):\n    n = len(sorted_array)\n    tree = [0] * (n + 1)\n\n    def build(sorted_arr, i=1):\n        if not sorted_arr:\n            return\n        mid = len(sorted_arr) // 2\n        tree[i] = sorted_arr[mid]\n        build(sorted_arr[:mid], 2 * i)\n        build(sorted_arr[mid + 1:], 2 * i + 1)\n\n    build(sorted_array)\n    return tree\n\n\ndef search_eytzinger(tree, target):\n    i = 1\n    while i < len(tree) and tree[i] != 0:\n        if tree[i] == target:\n            return i\n        i = 2 * i + (0 if tree[i] > target else 1)\n    return -1\n\n\nA = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]\ntree = eytzinger_layout(A)\nprint("Eytzinger layout:", tree)\nprint("Search for 40:", search_eytzinger(tree, 40))\n`},
+ "zorder":{python:`def interleave_bits(x, y):\n    z = 0\n    for i in range(16):\n        z |= ((x >> i) & 1) << (2 * i)\n        z |= ((y >> i) & 1) << (2 * i + 1)\n    return z\n\n\ndef z_order_points(points):\n    return sorted(points, key=lambda p: interleave_bits(p[0], p[1]))\n\n\npoints = [(0, 0), (1, 1), (2, 2), (3, 3), (0, 3), (3, 0)]\nsorted_pts = z_order_points(points)\nfor p in sorted_pts:\n    print(p, "->", interleave_bits(*p))\n`},
+ "geohash":{python:`BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz"\n\n\ndef geohash_encode(lat, lon, precision=8):\n    lat_range = [-90.0, 90.0]\n    lon_range = [-180.0, 180.0]\n    bits = []\n    is_lon = True\n    while len(bits) < precision * 5:\n        if is_lon:\n            mid = (lon_range[0] + lon_range[1]) / 2\n            if lon > mid:\n                bits.append(1)\n                lon_range[0] = mid\n            else:\n                bits.append(0)\n                lon_range[1] = mid\n        else:\n            mid = (lat_range[0] + lat_range[1]) / 2\n            if lat > mid:\n                bits.append(1)\n                lat_range[0] = mid\n            else:\n                bits.append(0)\n                lat_range[1] = mid\n        is_lon = not is_lon\n    encoded = ""\n    for i in range(0, len(bits), 5):\n        chunk = bits[i:i + 5]\n        val = 0\n        for b in chunk:\n            val = (val << 1) | b\n        encoded += BASE32[val]\n    return encoded\n\n\nprint(geohash_encode(37.7749, -122.4194, 8))\nprint(geohash_encode(51.5074, -0.1278, 8))\n`},
+};
+
+/* ============================================================
+   Labs
+   ============================================================ */
+function parseList(s){return s.split(/[\n,]+/).map(x=>x.trim()).filter(Boolean)}
+function parseNums(s){const a=s.split(/[,\s]+/).map(x=>x.trim()).filter(Boolean).map(Number);if(!a.length||a.some(x=>!Number.isFinite(x)))throw Error('Enter comma separated numbers');return a}
+
+function demoLinearSearch(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ if(blocks.length<2)throw Error('Enter a comma separated list, a blank line, then the target');
+ const arr=parseNums(blocks[0]);
+ const target=Number(blocks[1].trim());
+ if(!Number.isFinite(target))throw Error('Target must be a number');
+ let steps=[];
+ let found=-1;
+ for(let i=0;i<arr.length;i++){
+  steps.push(`check A[${i}] = ${arr[i]} vs ${target}`);
+  if(arr[i]===target){found=i;break}
+ }
+ return {
+  encoded:`Array: [${arr.join(', ')}]\nTarget: ${target}\n\n${steps.join('\n')}\n\nResult: ${found>=0?`found at index ${found}`:'not found'}\nComparisons: ${steps.length}`,
+  decoded:`Linear search checks each element in order. It works on any array, sorted or not. Average and worst case are O(n).`,
+  steps:steps.length,units:steps.length,tokens:1
+ };
+}
+function demoBinarySearch(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ if(blocks.length<2)throw Error('Enter a sorted comma separated list, a blank line, then the target');
+ const arr=parseNums(blocks[0]);
+ const target=Number(blocks[1].trim());
+ let low=0,high=arr.length-1;let steps=[];let found=-1;
+ while(low<=high){
+  const mid=low+((high-low)>>1);
+  steps.push(`[${low}, ${high}]  mid=${mid}  A[mid]=${arr[mid]}`);
+  if(arr[mid]===target){found=mid;break}
+  if(arr[mid]<target)low=mid+1;else high=mid-1;
+ }
+ return {
+  encoded:`Sorted array: [${arr.join(', ')}]\nTarget: ${target}\n\n${steps.join('\n')}\n\nResult: ${found>=0?`found at index ${found}`:'not found'}\nComparisons: ${steps.length}`,
+  decoded:`Binary search halves the search range at each step. It requires sorted data and random access. O(log n) comparisons.`,
+  steps:steps.length,units:steps.length,tokens:1
+ };
+}
+function demoTernarySearch(text){
+ const points=text.trim().split(/\n/).map(l=>l.split(/[,\s]+/).map(Number)).filter(p=>p.length===2);
+ if(points.length<3)throw Error('Enter points as x y, one per line');
+ // fit a simple unimodal function through the sample for demo
+ const f=x=>-(x-3)*(x-3)+10;
+ let low=0,high=10;const steps=[];
+ for(let i=0;i<50;i++){
+  const m1=low+(high-low)/3,m2=high-(high-low)/3;
+  steps.push(`[${low.toFixed(3)}, ${high.toFixed(3)}]  m1=${m1.toFixed(3)} f=${f(m1).toFixed(3)}  m2=${m2.toFixed(3)} f=${f(m2).toFixed(3)}`);
+  if(f(m1)<f(m2))low=m1;else high=m2;
+ }
+ const maxX=(low+high)/2;
+ return {
+  encoded:`Sample points (unimodal assumption):\n${points.slice(0,6).map(p=>`  (${p[0]}, ${p[1]})`).join('\n')}\n\nTernary search on f(x) = -(x-3)^2 + 10:\n${steps.slice(0,8).join('\n')}\n\n...\n\nApproximate maximum at x = ${maxX.toFixed(4)}, f = ${f(maxX).toFixed(4)}`,
+  decoded:`Ternary search narrows the range of a unimodal function by evaluating at two interior points. If f(m1) < f(m2), the maximum is in [m1, high]. Otherwise it is in [low, m2].`,
+  steps:50,units:100,tokens:1
+ };
+}
+function demoInterpExp(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ if(blocks.length<2)throw Error('Enter a sorted list, a blank line, then a target');
+ const arr=parseNums(blocks[0]);
+ const target=Number(blocks[1].trim());
+ let low=0,high=arr.length-1;const interpSteps=[];
+ let found=-1;
+ while(low<=high&&arr[low]<=target&&target<=arr[high]){
+  if(arr[high]===arr[low])break;
+  const pos=low+Math.floor((target-arr[low])*(high-low)/(arr[high]-arr[low]));
+  interpSteps.push(`[${low},${high}]  pos=${pos}  A[pos]=${arr[pos]}`);
+  if(arr[pos]===target){found=pos;break}
+  if(arr[pos]<target)low=pos+1;else high=pos-1;
+ }
+ const expSteps=[];
+ let bound=1;
+ if(arr[0]===target){found=0}
+ else{
+  while(bound<arr.length&&arr[bound]<target){expSteps.push(`A[${bound}]=${arr[bound]} < ${target}, double`);bound*=2}
+  const l=Math.floor(bound/2),r=Math.min(bound+1,arr.length);
+  for(let i=l;i<r;i++){expSteps.push(`binary search A[${i}]=${arr[i]}`);if(arr[i]===target){found=i;break}}
+ }
+ return {
+  encoded:`Interpolation search:\n${interpSteps.join('\n')}\n\nExponential search:\n${expSteps.join('\n')}\n\nResult: ${found>=0?`found at ${found}`:'not found'}`,
+  decoded:`Interpolation search estimates the position from the value distribution. Exponential search doubles the range to find a bracket, then binary searches inside.`,
+  steps:interpSteps.length+expSteps.length,units:interpSteps.length+expSteps.length,tokens:1
+ };
+}
+function demoLowerUpper(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ if(blocks.length<2)throw Error('Enter a sorted list, a blank line, then a target');
+ const arr=parseNums(blocks[0]);
+ const target=Number(blocks[1].trim());
+ let lo=0,hi=arr.length;
+ while(lo<hi){const mid=(lo+hi)>>1;if(arr[mid]<target)lo=mid+1;else hi=mid}
+ const lower=lo;
+ lo=0;hi=arr.length;
+ while(lo<hi){const mid=(lo+hi)>>1;if(arr[mid]<=target)lo=mid+1;else hi=mid}
+ const upper=lo;
+ return {
+  encoded:`Array: [${arr.join(', ')}]\nTarget: ${target}\n\nlower_bound = ${lower}\nupper_bound = ${upper}\n\nEqual range: [${lower}, ${upper})\nCount: ${upper-lower}`,
+  decoded:`lower_bound returns the first index where A[i] >= target. upper_bound returns the first index where A[i] > target.`,
+  steps:2,units:2,tokens:1
+ };
+}
+function demoMonotonic(text){
+ const n=Math.max(1,parseInt(text.trim())||1000);
+ function predicate(x){return x*x*x>=n}
+ let low=1,high=Math.max(1,n);const steps=[];
+ while(low<high){
+  const mid=(low+high)>>1;
+  steps.push(`[${low}, ${high}]  mid=${mid}  P=${predicate(mid)}`);
+  if(predicate(mid))high=mid;else low=mid+1;
+ }
+ return {
+  encoded:`Find smallest x with x^3 >= ${n}\n\n${steps.join('\n')}\n\nAnswer: x = ${low}`,
+  decoded:`Binary search on a monotonic predicate finds the smallest x where the predicate becomes true. This works for any monotonic function, not just sorted arrays.`,
+  steps:steps.length,units:steps.length,tokens:1
+ };
+}
+function demoHashLookup(text){
+ const lines=text.trim().split(/\n/).filter(Boolean);
+ if(lines.length<2)throw Error('Enter keys, one per line, then a blank line and the search key');
+ // Separate into keys and query
+ const blank=lines.findIndex(l=>l.trim()==='');
+ let keys,query;
+ if(blank>=0){keys=lines.slice(0,blank);query=lines[blank+1]}
+ else{keys=lines.slice(0,-1);query=lines[lines.length-1]}
+ const m=11;
+ const buckets=Array.from({length:m},()=>[]);
+ for(const k of keys){
+  let h=0;for(const c of k)h=(Math.imul(h,31)+c.charCodeAt(0))>>>0;
+  buckets[h%m].push(k);
+ }
+ const qh=(()=>{let h=0;for(const c of query)h=(Math.imul(h,31)+c.charCodeAt(0))>>>0;return h%m})();
+ const found=buckets[qh].includes(query);
+ const rows=buckets.map((b,i)=>`  [${String(i).padStart(2)}] ${b.length?b.join(', '):'(empty)'}`);
+ return {
+  encoded:`Hash of "${query}" = ${qh}\n\nBuckets (m = ${m}):\n${rows.join('\n')}\n\nLookup result: ${found?'FOUND':'NOT FOUND'}\nProbes in bucket ${qh}: ${buckets[qh].indexOf(query)+1 || buckets[qh].length+1}`,
+  decoded:`A hash table maps keys to buckets via a hash function. Lookup takes the bucket and scans it. With load factor around 1, average lookup is O(1 + alpha).`,
+  steps:keys.length,units:keys.length,tokens:1
+ };
+}
+function demoSkipList(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ if(blocks.length<2)throw Error('Enter a list, a blank line, then a target');
+ const keys=parseNums(blocks[0]);
+ const target=Number(blocks[1].trim());
+ // Build levels deterministically for demo
+ const levels=[keys.slice()];
+ let curr=keys.filter((_,i)=>i%2===0);
+ while(curr.length>1){levels.unshift(curr);curr=curr.filter((_,i)=>i%2===0)}
+ let node=null;let path=[];
+ // Simplified: descend from top and count comparisons at each level
+ for(let l=0;l<levels.length;l++){
+  const arr=levels[l];
+  let idx=0;
+  while(idx<arr.length&&arr[idx]<target)idx++;
+  path.push(`level ${levels.length-1-l}: visit ${idx} elements, next is ${arr[idx]!==undefined?arr[idx]:'end'}`);
+ }
+ const found=keys.includes(target);
+ return {
+  encoded:`Keys: [${keys.join(', ')}]\nTarget: ${target}\n\nLevel structure:\n${levels.map((l,i)=>`  level ${levels.length-1-i}: [${l.join(', ')}]`).join('\n')}\n\nSearch path:\n${path.join('\n')}\n\nResult: ${found?'FOUND':'NOT FOUND'}`,
+  decoded:`A skip list has multiple linked levels. The top level skips the most elements. Search descends when the next element is too large.`,
+  steps:keys.length,units:keys.length,tokens:1
+ };
+}
+function demoTrie(text){
+ const lines=text.trim().split(/\n/).filter(Boolean);
+ const blank=lines.findIndex(l=>l.trim()==='');
+ let words,queries;
+ if(blank>=0){words=lines.slice(0,blank);queries=lines.slice(blank+1)}
+ else{words=lines.slice(0,-1);queries=[lines[lines.length-1]]}
+ const trie={};
+ for(const w of words){
+  let node=trie;
+  for(const ch of w){node[ch]=node[ch]||{};node=node[ch]}
+  node.$=true;
+ }
+ function lookup(w){
+  let node=trie;
+  for(const ch of w){if(!node[ch])return 'prefix not found';node=node[ch]}
+  return node.$?'word found':(Object.keys(node).length>0?'prefix only':'not found');
+ }
+ function listPrefix(prefix){
+  let node=trie;
+  for(const ch of prefix){if(!node[ch])return[];node=node[ch]}
+  const out=[];
+  function walk(n,p){if(n.$)out.push(p);for(const ch of Object.keys(n))if(ch!=='$')walk(n[ch],p+ch)}
+  walk(node,prefix);
+  return out;
+ }
+ return {
+  encoded:`Words: ${words.join(', ')}\n\nLookups:\n${queries.map(q=>`  ${q}: ${lookup(q)}  ${lookup(q)==='prefix only'?`(matches: ${listPrefix(q).join(', ')})`:''}`).join('\n')}`,
+  decoded:`A trie stores each character on an edge. Lookup walks the trie one character at a time. Time is O(m) where m is the query length, independent of the number of stored words.`,
+  steps:words.length,units:queries.length,tokens:1
+ };
+}
+function demoRadixTrie(text){
+ const words=text.trim().split(/\n/).filter(Boolean);
+ // Build a compressed trie structure for display
+ const root={children:{},is_end:false,prefix:''};
+ for(const w of words){
+  let node=root,i=0;
+  while(i<w.length){
+   const ch=w[i];
+   if(node.children[ch]){
+    const child=node.children[ch];
+    let j=0;
+    while(j<child.prefix.length&&i+j<w.length&&child.prefix[j]===w[i+j])j++;
+    if(j===child.prefix.length){i+=j;node=child;continue}
+    // split
+    const rest={children:child.children,is_end:child.is_end,prefix:child.prefix.slice(j)};
+    child.prefix=child.prefix.slice(0,j);
+    child.is_end=false;
+    child.children={};
+    child.children[rest.prefix[0]]=rest;
+    i+=j;
+   } else {
+    node.children[ch]={children:{},is_end:true,prefix:w.slice(i)};
+    break;
+   }
+  }
+  node.is_end=true;
+ }
+ function print(node,depth,out){
+  for(const ch of Object.keys(node.children)){
+   const c=node.children[ch];
+   out.push('  '.repeat(depth)+`"${c.prefix}"${c.is_end?' *':''}`);
+   print(c,depth+1,out);
+  }
+  return out;
+ }
+ const lines=print(root,0,[]);
+ return {
+  encoded:`Words: ${words.join(', ')}\n\nRadix trie (compressed):\n${lines.join('\n')}\n\nOriginal node count: ${words.reduce((s,w)=>s+w.length,0)}\nCompressed node count: ${lines.length}`,
+  decoded:`A radix trie merges chains of single-child nodes into one edge. The edge label is the whole substring. This cuts node count dramatically for typical word sets.`,
+  steps:words.length,units:lines.length,tokens:1
+ };
+}
+function demoTst(text){
+ const words=text.trim().split(/\n/).filter(Boolean);
+ // Build TST and print structure
+ class Node{constructor(c){this.c=c;this.l=null;this.m=null;this.r=null;this.end=false}}
+ let root=null;
+ function insert(node,w,i){
+  const ch=w[i];
+  if(!node)node=new Node(ch);
+  if(ch<node.c)node.l=insert(node.l,w,i);
+  else if(ch>node.c)node.r=insert(node.r,w,i);
+  else if(i+1===w.length)node.end=true;
+  else node.m=insert(node.m,w,i+1);
+  return node;
+ }
+ for(const w of words)root=insert(root,w,0);
+ function search(node,w,i){
+  while(node){
+   if(w[i]<node.c)node=node.l;
+   else if(w[i]>node.c)node=node.r;
+   else{i++;if(i===w.length)return node.end;node=node.m}
+  }
+  return false;
+ }
+ return {
+  encoded:`Words: ${words.join(', ')}\n\nQueries:\n${words.slice(0,6).map(w=>`  ${w}: ${search(root,w,0)}`).join('\n')}\n\nRandom query "xyz": ${search(root,'xyz',0)}`,
+  decoded:`A ternary search tree stores one character per node with three children: less, equal, greater. It uses less memory than a plain trie for sparse alphabets, at the cost of a binary search at each level.`,
+  steps:words.length,units:words.length,tokens:1
+ };
+}
+function demoSuffixArray(text){
+ const s=text.trim().split(/\n/)[0];
+ if(!s)throw Error('Enter a string');
+ const n=s.length;
+ const sa=Array.from({length:n},(_,i)=>i).sort((a,b)=>s.slice(a)<s.slice(b)?-1:1);
+ const rows=sa.map(i=>`  ${String(i).padStart(3)}  ${s.slice(i)}`);
+ return {
+  encoded:`String: "${s}"\nLength: ${n}\n\nSuffix array:\n${rows.join('\n')}\n\nSA = [${sa.join(', ')}]`,
+  decoded:`The suffix array is the sorted list of suffix starting positions. Building it naively is O(n^2 log n) but linear-time algorithms exist (SA-IS).`,
+  steps:n,units:n,tokens:1
+ };
+}
+function demoBTree(text){
+ const keys=parseNums(text);
+ // simplified B-tree with t=2 (max 3 keys per node)
+ const t=2;
+ let nodes=[keys.slice()];
+ // Simulate a single split at root
+ if(keys.length>3){
+  const sorted=[...keys].sort((a,b)=>a-b);
+  const mid=Math.floor(sorted.length/2);
+  const rootKey=sorted[mid];
+  const left=sorted.slice(0,mid);
+  const right=sorted.slice(mid+1);
+  return {
+   encoded:`Input keys: ${keys.join(', ')}\n\nB-tree (order 4) after insertion:\n  root: [${rootKey}]\n  left leaf:  [${left.join(', ')}]\n  right leaf: [${right.join(', ')}]\n\nAll leaves at the same depth.`,
+   decoded:`A B-tree keeps nodes wide and the tree short. With an order of 1000 or more, a tree of billions of keys has height about 3. Each level is one disk read.`,
+   steps:keys.length,units:3,tokens:1
+  };
+ }
+ return {
+  encoded:`Input keys: ${keys.join(', ')}\n\nRoot node holds all keys: [${keys.join(', ')}]`,
+  decoded:`When a B-tree node exceeds its maximum size, it splits and pushes a key up to the parent. This keeps the tree balanced.`,
+  steps:keys.length,units:1,tokens:1
+ };
+}
+function demoBPlusTree(text){
+ const keys=parseNums(text).sort((a,b)=>a-b);
+ const t=2;
+ // split into leaves of size 2
+ const leaves=[];
+ for(let i=0;i<keys.length;i+=t)leaves.push(keys.slice(i,i+t));
+ const routing=[];
+ for(let i=1;i<leaves.length;i++)routing.push(leaves[i][0]);
+ return {
+  encoded:`Sorted keys: ${keys.join(', ')}\n\nB+ tree structure:\n  root: [${routing.join(', ')}]\n${leaves.map((l,i)=>`  leaf ${i}: [${l.join(', ')}]  -> next: ${i+1<leaves.length?'leaf '+(i+1):'null'}`).join('\n')}\n\nAll data is in the leaves. Internal nodes only route.`,
+  decoded:`A B+ tree stores data only in the leaves and links them. Range queries descend to the first leaf and follow the links. This is why databases use B+ trees, not B-trees.`,
+  steps:keys.length,units:leaves.length,tokens:1
+ };
+}
+function demoInvertedIndex(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ if(blocks.length<2)throw Error('Enter documents (one per line), a blank line, then the query terms');
+ const docs=blocks[0].split(/\n/).filter(Boolean);
+ const query=blocks[1].toLowerCase().split(/\s+/).filter(Boolean);
+ const idx={};
+ docs.forEach((doc,i)=>{
+  for(const term of doc.toLowerCase().split(/\s+/)){
+   (idx[term]=idx[term]||[]).push(i);
+  }
+ });
+ const results=query.length?query.reduce((acc,t)=>{
+  const list=idx[t]||[];
+  return acc===null?new Set(list):new Set([...acc].filter(x=>list.includes(x)));
+ },null):new Set();
+ const rows=Object.entries(idx).sort().map(([t,l])=>`  "${t}": [${l.join(', ')}]`);
+ return {
+  encoded:`Documents:\n${docs.map((d,i)=>`  ${i}: ${d}`).join('\n')}\n\nInverted index:\n${rows.join('\n')}\n\nQuery: ${query.join(' AND ')}\nResult docs: [${[...(results||[])].join(', ')}]`,
+  decoded:`An inverted index maps each term to the list of documents containing it. AND queries intersect the posting lists. This is how all full-text search engines work.`,
+  steps:docs.length,units:results?results.size:0,tokens:Object.keys(idx).length
+ };
+}
+function demoEditDistance(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ const lines=text.trim().split(/\n/).filter(Boolean);
+ const a=lines[0],b=lines[1]||'';
+ if(!a||!b)throw Error('Enter two strings on separate lines');
+ const m=a.length,n=b.length;
+ const dp=Array.from({length:m+1},()=>new Array(n+1).fill(0));
+ for(let i=0;i<=m;i++)dp[i][0]=i;
+ for(let j=0;j<=n;j++)dp[0][j]=j;
+ for(let i=1;i<=m;i++)for(let j=1;j<=n;j++){
+  const cost=a[i-1]===b[j-1]?0:1;
+  dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+cost);
+ }
+ const rows=[];
+ for(let i=0;i<=m;i++)rows.push('  '+dp[i].map(x=>String(x).padStart(3)).join(''));
+ return {
+  encoded:`a = "${a}"\nb = "${b}"\n\nDP table (rows are a, columns are b):\n${rows.join('\n')}\n\nLevenshtein distance: ${dp[m][n]}`,
+  decoded:`The dynamic programming table computes the edit distance. Each cell is the minimum of three moves: delete, insert or substitute.`,
+  steps:m*n,units:m*n,tokens:1
+ };
+}
+function demoBkTree(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ const wordLines=blocks[0].split(/\n/).filter(Boolean);
+ const queryParts=(blocks[1]||'').trim().split(/\s+/);
+ const query=queryParts[0]||wordLines[0];
+ const k=parseInt(queryParts[1]||'2');
+ function edit(a,b){
+  const m=a.length,n=b.length;
+  const prev=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){
+   let curr=[i];
+   for(let j=1;j<=n;j++){
+    const cost=a[i-1]===b[j-1]?0:1;
+    curr[j]=Math.min(prev[j]+1,curr[j-1]+1,prev[j-1]+cost);
+   }
+   prev.length=0;prev.push(...curr);
+  }
+  return prev[n];
+ }
+ // Brute-force search for comparison
+ const results=wordLines.map(w=>[edit(query,w),w]).filter(([d])=>d<=k).sort((a,b)=>a[0]-b[0]);
+ return {
+  encoded:`Dictionary: ${wordLines.join(', ')}\nQuery: "${query}" with radius k = ${k}\n\nResults:\n${results.map(([d,w])=>`  ${w}  (distance ${d})`).join('\n') || '  (none)'}`,
+  decoded:`A BK-tree groups words by edit distance to a root. For a query and radius k, only children with distances in [d-k, d+k] are visited. This prunes most of the tree.`,
+  steps:wordLines.length,units:results.length,tokens:1
+ };
+}
+function demoSymSpell(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ const words=blocks[0].split(/\n/).filter(Boolean);
+ const queryParts=(blocks[1]||'').trim().split(/\s+/);
+ const query=queryParts[0]||words[0];
+ const maxEdits=parseInt(queryParts[1]||'2');
+ function deletes(w,n){
+  let results=new Set([w]);
+  for(let step=0;step<n;step++){
+   const next=new Set();
+   for(const x of results)for(let i=0;i<x.length;i++)next.add(x.slice(0,i)+x.slice(i+1));
+   results=next;
+  }
+  return results;
+ }
+ const index={};
+ for(const w of words)for(const d of deletes(w,1))(index[d]=index[d]||[]).push(w);
+ const candidates=new Set();
+ for(const d of deletes(query,maxEdits))for(const w of index[d]||[])candidates.add(w);
+ function edit(a,b){
+  const m=a.length,n=b.length;
+  const prev=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){
+   const curr=[i];
+   for(let j=1;j<=n;j++){
+    const cost=a[i-1]===b[j-1]?0:1;
+    curr[j]=Math.min(prev[j]+1,curr[j-1]+1,prev[j-1]+cost);
+   }
+   prev.length=0;prev.push(...curr);
+  }
+  return prev[n];
+ }
+ const results=[...candidates].map(w=>[edit(query,w),w]).sort((a,b)=>a[0]-b[0]);
+ return {
+  encoded:`Dictionary: ${words.join(', ')}\nQuery: "${query}"\n\nIndex size: ${Object.keys(index).length} keys\n\nCandidates:\n${results.map(([d,w])=>`  ${w}  (edit distance ${d})`).join('\n') || '  (none)'}`,
+  decoded:`SymSpell precomputes all one-deletion variants of dictionary words. At query time it generates deletions of the query and looks them up in the hash table. This makes correction O(1) for edit distance 1.`,
+  steps:words.length,units:Object.keys(index).length,tokens:1
+ };
+}
+function demoSoundex(text){
+ const names=text.trim().split(/\n/).filter(Boolean);
+ function soundex(name){
+  if(!name)return '';
+  name=name.toUpperCase();
+  const codes={B:'1',F:'1',P:'1',V:'1',C:'2',G:'2',J:'2',K:'2',Q:'2',S:'2',X:'2',Z:'2',D:'3',T:'3',L:'4',M:'5',N:'5',R:'6'};
+  let first=name[0],tail=name.slice(1);
+  const out=[];
+  let prev=codes[first]||'';
+  for(const ch of tail){
+   const code=codes[ch]||'';
+   if(code&&code!==prev){out.push(code);prev=code}
+   else if(!code)prev='';
+  }
+  return (first+out.join('')+'000').slice(0,4);
+ }
+ return {
+  encoded:names.map(n=>`  ${n} -> ${soundex(n)}`).join('\n'),
+  decoded:`Soundex encodes names phonetically. Words that sound similar get the same code. Smith, Smyth and Smithe all encode to S530.`,
+  steps:names.length,units:names.length,tokens:1
+ };
+}
+function demoKdTree(text){
+ const lines=text.trim().split(/\n/).filter(Boolean);
+ const points=lines.map(l=>l.split(/[\s,]+/).map(Number)).filter(p=>p.length===2&&p.every(Number.isFinite));
+ if(points.length<2)throw Error('Enter 2D points one per line');
+ const query=points[points.length-1];
+ const data=points.slice(0,-1);
+ class Node{constructor(p,axis){this.p=p;this.axis=axis;this.l=null;this.r=null}}
+ function build(pts,depth){
+  if(!pts.length)return null;
+  const axis=depth%2;
+  const sorted=[...pts].sort((a,b)=>a[axis]-b[axis]);
+  const mid=Math.floor(sorted.length/2);
+  const node=new Node(sorted[mid],axis);
+  node.l=build(sorted.slice(0,mid),depth+1);
+  node.r=build(sorted.slice(mid+1),depth+1);
+  return node;
+ }
+ const root=build(data,0);
+ let best=null,bestD=Infinity;
+ function visit(node){
+  if(!node)return;
+  const d=Math.hypot(query[0]-node.p[0],query[1]-node.p[1]);
+  if(d<bestD){bestD=d;best=node.p}
+  const axis=node.axis;
+  const first=query[axis]<node.p[axis]?node.l:node.r;
+  const second=query[axis]<node.p[axis]?node.r:node.l;
+  visit(first);
+  if(Math.abs(query[axis]-node.p[axis])<bestD)visit(second);
+ }
+ visit(root);
+ return {
+  encoded:`Points: ${data.map(p=>`(${p.join(',')})`).join(' ')}\nQuery: (${query.join(', ')})\n\nNearest neighbour: (${best.join(', ')})  distance = ${bestD.toFixed(4)}`,
+  decoded:`A k-d tree splits space by axis at each level. Nearest-neighbour search descends into the closer branch, then checks the other branch only if it could contain a closer point.`,
+  steps:data.length,units:data.length,tokens:1
+ };
+}
+function demoPq(text){
+ const rows=text.trim().split(/\n/).filter(Boolean).map(l=>l.split(/[\s,]+/).map(Number));
+ if(rows.length<2)throw Error('Enter at least 2 vectors, one per line');
+ const D=rows[0].length;
+ const M=Math.min(2,D>>1);
+ const Dsub=D/M;
+ const codebooks=[];
+ for(let m=0;m<M;m++){
+  const sub=rows.map(r=>r.slice(m*Dsub,(m+1)*Dsub));
+  const K=Math.min(4,sub.length);
+  let centroids=sub.slice(0,K).map(r=>r.slice());
+  const labels=[];
+  for(let iter=0;iter<20;iter++){
+   labels.length=0;
+   for(const v of sub){
+    let best=0,bd=Infinity;
+    centroids.forEach((c,k)=>{const d=v.reduce((s,x,i)=>s+(x-c[i])**2,0);if(d<bd){bd=d;best=k}});
+    labels.push(best);
+   }
+   for(let k=0;k<K;k++){
+    const members=sub.filter((_,i)=>labels[i]===k);
+    if(members.length)centroids[k]=members[0].map((_,j)=>members.reduce((s,r)=>s+r[j],0)/members.length);
+   }
+  }
+  codebooks.push({centroids,labels});
+ }
+ return {
+  encoded:`Vectors: ${rows.length} by ${D}\nM = ${M} subspaces of dimension ${Dsub}\nK = 4 centroids per subspace\n\nQuantized codes (first 6 vectors):\n${codebooks[0].labels.slice(0,6).map((l,i)=>`  vector ${i}: [${codebooks.map(c=>c.labels[i]).join(', ')}]`).join('\n')}\n\nCompression: ${D*4} bytes -> ${M} bytes (${(D*4/M).toFixed(1)}x)`,
+  decoded:`Product quantization splits a vector into M subvectors, quantizes each with its own codebook, and stores the M indices. Distance is computed with lookup tables.`,
+  steps:rows.length*M,units:rows.length*M,tokens:1
+ };
+}
+function demoScalarQ(text){
+ const rows=text.trim().split(/\n/).filter(Boolean).map(l=>l.split(/[\s,]+/).map(Number));
+ if(!rows.length)throw Error('Enter vectors, one per line');
+ const D=rows[0].length;
+ const mins=new Array(D).fill(Infinity);
+ const maxs=new Array(D).fill(-Infinity);
+ for(const r of rows)for(let d=0;d<D;d++){if(r[d]<mins[d])mins[d]=r[d];if(r[d]>maxs[d])maxs[d]=r[d]}
+ const K=16;
+ const widths=mins.map((_,d)=>Math.max(1e-9,(maxs[d]-mins[d])/(K-1)));
+ const codes=rows.map(r=>r.map((v,d)=>Math.round((v-mins[d])/widths[d])));
+ const recon=codes.map(c=>c.map((v,d)=>v*widths[d]+mins[d]));
+ let maxErr=0;
+ for(let i=0;i<rows.length;i++)for(let d=0;d<D;d++)maxErr=Math.max(maxErr,Math.abs(rows[i][d]-recon[i][d]));
+ return {
+  encoded:`Vectors: ${rows.length} by ${D}\nQuantization: 16 buckets per dimension\n\nCodes (first 6 rows):\n${codes.slice(0,6).map((c,i)=>`  row ${i}: [${c.join(', ')}]`).join('\n')}\n\nMax absolute reconstruction error: ${maxErr.toFixed(4)}\nCompression: 4 bytes per value -> 1 byte (4x)`,
+  decoded:`Scalar quantization treats each dimension independently. Simple and fast, gives 4x compression at 8-bit precision.`,
+  steps:rows.length*D,units:rows.length*D,tokens:1
+ };
+}
+function demoLsh(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ const vecLines=blocks[0].split(/\n/).filter(Boolean).map(l=>l.split(/[\s,]+/).map(Number));
+ const query=blocks[1]?blocks[1].split(/[\s,]+/).map(Number):vecLines[0];
+ if(!vecLines.length||!query.length)throw Error('Enter vectors, a blank line, then the query vector');
+ const D=vecLines[0].length;
+ const k=8;
+ const planes=Array.from({length:k},()=>Array.from({length:D},()=>Math.random()*2-1));
+ const hash=v=>planes.map(p=>p.reduce((s,x,i)=>s+x*v[i],0)>0?1:0);
+ const queryHash=hash(query);
+ const candidates=[];
+ vecLines.forEach((v,i)=>{
+  const h=hash(v);
+  const match=h.filter((b,j)=>b===queryHash[j]).length;
+  if(match>=Math.floor(k*0.75))candidates.push([i,match]);
+ });
+ return {
+  encoded:`Vectors: ${vecLines.length}\nQuery: [${query.join(', ')}]\nQuery hash: [${queryHash.join('')}]\n\nCandidates with >= 75% hash match:\n${candidates.map(([i,m])=>`  vector ${i}: ${m}/${k} matches`).join('\n') || '  (none)'}`,
+  decoded:`Random hyperplane LSH hashes vectors by their side of random planes. Similar vectors have similar hashes with high probability. This turns nearest-neighbour search into a hash lookup.`,
+  steps:vecLines.length,units:candidates.length,tokens:1
+ };
+}
+function demoEytzinger(text){
+ const blocks=text.trim().split(/\n\s*\n/);
+ const arr=parseNums(blocks[0]).sort((a,b)=>a-b);
+ const target=Number(blocks[1]?blocks[1].trim():arr[Math.floor(arr.length/2)]);
+ const n=arr.length;
+ const tree=new Array(n+1).fill(0);
+ function build(a,i){
+  if(!a.length)return;
+  const mid=Math.floor(a.length/2);
+  tree[i]=a[mid];
+  build(a.slice(0,mid),2*i);
+  build(a.slice(mid+1),2*i+1);
+ }
+ build(arr,1);
+ let idx=1;const path=[];
+ while(idx<n+1&&tree[idx]!==0){
+  path.push(`tree[${idx}] = ${tree[idx]}`);
+  if(tree[idx]===target)break;
+  idx=2*idx+(target>tree[idx]?1:0);
+ }
+ return {
+  encoded:`Sorted array: [${arr.join(', ')}]\nTarget: ${target}\n\nEytzinger layout:\n  ${tree.slice(1).join(', ')}\n\nSearch path:\n${path.join('\n')}\n\nFound: ${tree[idx]===target}`,
+  decoded:`The Eytzinger layout stores a binary search tree in breadth-first order. Each level of the tree fits in one cache line, so searches are cache friendly.`,
+  steps:Math.ceil(Math.log2(n+1)),units:Math.ceil(Math.log2(n+1)),tokens:1
+ };
+}
+function demoZorder(text){
+ const points=text.trim().split(/\n/).filter(Boolean).map(l=>l.split(/[\s,]+/).map(Number).filter(Number.isFinite));
+ if(!points.length)throw Error('Enter points as x y one per line');
+ function interleave(x,y){
+  let z=0;
+  for(let i=0;i<16;i++){
+   z|=((x>>i)&1)<<(2*i);
+   z|=((y>>i)&1)<<(2*i+1);
+  }
+  return z>>>0;
+ }
+ const sorted=[...points].map(p=>({p,z:interleave(p[0],p[1])})).sort((a,b)=>a.z-b.z);
+ return {
+  encoded:`Points sorted by Z-order:\n${sorted.map(({p,z})=>`  (${p[0]}, ${p[1]})  ->  ${z}`).join('\n')}`,
+  decoded:`The Z-order (Morton) code interleaves the bits of the coordinates. Points close in space tend to be close in the Z-order index, which makes range queries efficient.`,
+  steps:points.length,units:points.length,tokens:1
+ };
+}
+function demoGeohash(text){
+ const lines=text.trim().split(/\n/).filter(Boolean);
+ const lat=Number(lines[0]);
+ const lon=Number(lines[1]);
+ const precision=parseInt(lines[2]||'8');
+ if(!Number.isFinite(lat)||!Number.isFinite(lon))throw Error('Enter latitude, then longitude');
+ const BASE32="0123456789bcdefghjkmnpqrstuvwxyz";
+ let latR=[-90,90],lonR=[-180,180];
+ const bits=[];
+ let isLon=true;
+ while(bits.length<precision*5){
+  if(isLon){
+   const mid=(lonR[0]+lonR[1])/2;
+   if(lon>mid){bits.push(1);lonR[0]=mid}else{bits.push(0);lonR[1]=mid}
+  }else{
+   const mid=(latR[0]+latR[1])/2;
+   if(lat>mid){bits.push(1);latR[0]=mid}else{bits.push(0);latR[1]=mid}
+  }
+  isLon=!isLon;
+ }
+ let hash='';
+ for(let i=0;i<bits.length;i+=5){
+  let v=0;for(let j=0;j<5;j++)v=(v<<1)|bits[i+j];
+  hash+=BASE32[v];
+ }
+ return {
+  encoded:`Latitude:  ${lat}\nLongitude: ${lon}\nPrecision: ${precision}\n\nGeohash: ${hash}\n\nBounding box after precision ${precision}:\n  lat: [${latR[0].toFixed(6)}, ${latR[1].toFixed(6)}]\n  lon: [${lonR[0].toFixed(6)}, ${lonR[1].toFixed(6)}]`,
+  decoded:`Geohash interleaves the bits of latitude and longitude and encodes them in base32. Longer strings mean smaller cells. Prefix matching finds spatial neighbours.`,
+  steps:precision*5,units:precision,tokens:1
+ };
+}
+
+/* ============================================================
+   Lab dispatcher
+   ============================================================ */
+function runLab(l,initial){
+ const input=$('#labInput').value;
+ let res;
+ try{
+  if(!initial){$('#labEncoded').textContent='Running…';$('#labDecoded').textContent=''}
+  switch(l.demo){
+   case'linear-search':res=demoLinearSearch(input);break;
+   case'binary-search':res=demoBinarySearch(input);break;
+   case'ternary-search':res=demoTernarySearch(input);break;
+   case'interp-exp':res=demoInterpExp(input);break;
+   case'lower-upper':res=demoLowerUpper(input);break;
+   case'monotonic':res=demoMonotonic(input);break;
+   case'hash-lookup':res=demoHashLookup(input);break;
+   case'skip-list':res=demoSkipList(input);break;
+   case'trie':res=demoTrie(input);break;
+   case'radix-trie':res=demoRadixTrie(input);break;
+   case'tst':res=demoTst(input);break;
+   case'suffix-array':res=demoSuffixArray(input);break;
+   case'b-tree':res=demoBTree(input);break;
+   case'b-plus-tree':res=demoBPlusTree(input);break;
+   case'inverted-index':res=demoInvertedIndex(input);break;
+   case'edit-distance':res=demoEditDistance(input);break;
+   case'bk-tree':res=demoBkTree(input);break;
+   case'symspell':res=demoSymSpell(input);break;
+   case'soundex':res=demoSoundex(input);break;
+   case'kd-tree':res=demoKdTree(input);break;
+   case'pq':res=demoPq(input);break;
+   case'scalar-q':res=demoScalarQ(input);break;
+   case'lsh':res=demoLsh(input);break;
+   case'eytzinger':res=demoEytzinger(input);break;
+   case'zorder':res=demoZorder(input);break;
+   case'geohash':res=demoGeohash(input);break;
+   default:throw Error('No interactive implementation is available for this lesson.');
+  }
+ }catch(e){
+  res={encoded:'Input or runtime error',decoded:e.message,steps:0,units:0,tokens:0};
+ }
+ $('#labEncoded').textContent=res.encoded;
+ $('#labDecoded').textContent=res.decoded;
+ if(!initial)toast('Lab complete');
+}
+
+/* ============================================================
+   State and shell
+   ============================================================ */
+const state={page:'home',current:null,completed:new Set(),bookmarks:new Set(),theme:'system',drafts:{}};
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1900)}
+function save(){try{localStorage.setItem('az-search-lab-v1',JSON.stringify({schemaVersion:1,completed:[...state.completed],bookmarks:[...state.bookmarks],theme:state.theme,current:state.current,drafts:state.drafts}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem('az-search-lab-v1')||'null');if(!d||d.schemaVersion!==1)return;
+ state.completed=new Set((d.completed||[]).filter(id=>byId[id]));
+ state.bookmarks=new Set((d.bookmarks||[]).filter(id=>byId[id]));
+ state.theme=['system','light','dark'].includes(d.theme)?d.theme:'system';
+ state.current=byId[d.current]?d.current:null;
+ state.drafts=d.drafts&&typeof d.drafts==='object'?d.drafts:{};}catch(e){}}
+function applyTheme(){let t=state.theme;if(t==='system')t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.dataset.theme=t;$('#themeSelect').value=state.theme}
+function getChapter(id){return CHAPTERS.find(c=>c.ids.includes(id))||CHAPTERS[0]}
+function progress(){
+ const n=state.completed.size,t=LESSONS.length;
+ $('#progressText').textContent=`${n} / ${t}`;
+ $('#progressFill').style.width=(n/t*100)+'%';
+ $('#lessonCount').textContent=t+' lessons';
+ $('#catalogCount').textContent=`${CHAPTERS.length} chapters · ${t} lessons · ${LESSONS.filter(l=>l.demo&&l.demo!=='none').length} labs`;
+ $('#progressBar').setAttribute('aria-valuenow',String(Math.round(n/t*100)));
+}
+function renderTree(){
+ const q=$('#searchInput').value.toLowerCase().trim(),ch=$('#chapterFilter').value;
+ const root=$('#courseTree');root.textContent='';
+ for(const c of CHAPTERS){
+  if(ch!=='all'&&c.id!==ch)continue;
+  const rows=c.ids.map(id=>byId[id]).filter(x=>x&&(!q||(x.title+' '+x.summary+' '+x.kind+' '+c.title).toLowerCase().includes(q)));
+  if(!rows.length)continue;
+  const group=document.createElement('section');
+  const label=document.createElement('div');label.className='group-label';
+  label.innerHTML=`<span>${esc(c.title)}</span><span>${rows.length}</span>`;
+  group.append(label);
+  rows.forEach(l=>{
+   const b=document.createElement('button');b.type='button';
+   b.className='link'+(state.current===l.id?' active':'');
+   b.dataset.lesson=l.id;
+   b.innerHTML=`<span class="num">${String(LESSONS.indexOf(l)+1).padStart(2,'0')}</span><span class="name">${esc(l.title)}</span>${state.completed.has(l.id)?'<span class="done" aria-label="completed">✓</span>':''}`;
+   group.append(b);
+  });
+  root.append(group);
+ }
+ if(!root.children.length)root.innerHTML='<p class="muted">No matching lessons. Try another search.</p>';
+ progress();
+}
+function listToHTML(a){return `<ol class="steps">${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`}
+function refsHTML(r){return r&&r.length?`<div class="references">${r.map(x=>`<a target="_blank" rel="noopener noreferrer" href="${esc(x[1])}">${esc(x[0])} ↗</a>`).join('')}</div>`:'<p class="muted">See the recommended textbooks, papers and official documentation for a full treatment.</p>'}
+function codeRecord(l){if(l.codeKey==='none')return null;return CODE[l.codeKey]||CODE[l.demo]||null}
+function codeText(l){
+ const c=codeRecord(l);
+ if(c&&c.python)return c.python;
+ return '# CONCEPT OUTLINE, NOT EXECUTABLE PYTHON\n# Lesson: '+l.title+'\n\n# Core idea\n# '+String(l.summary||'').replace(/\n/g,'\n# ')+'\n\n# Pseudocode from the lesson\n'+String(l.pseudo||'').split('\n').map(x=>'# '+x).join('\n')+'\n';
+}
+function statusClass(l){return /Runnable/.test(l.status)?'good':'warn'}
+
+function renderLesson(id){
+ const l=byId[id];if(!l){renderHome();return}
+ state.page='lesson';state.current=id;
+ const c=getChapter(id);const index=LESSONS.indexOf(l);const next=LESSONS[(index+1)%LESSONS.length];
+ const hasDemo=l.demo&&l.demo!=='none';
+ const demoArea=hasDemo?`<section class="panel"><div class="panel-head"><h2>${esc(l.demoTitle||'Interactive teaching lab')}</h2><p>Everything runs in your browser as a teaching implementation. For production work use a vetted library.</p></div><div class="body"><div class="lab-top"><label for="labInput">Input</label><button class="btn" id="resetSample">Reset sample</button><button class="btn primary" id="runLab">Run lab</button></div><textarea class="lab-input" id="labInput" aria-label="Lab input">${esc(l.sample||'')}</textarea><div class="notice info"><strong>Format:</strong> labs that need two parts use a blank line as a separator. See the sample for the expected format.</div><div class="lab-cols"><div><div class="label">Output</div><div class="lab-output" id="labEncoded">Run the lab to see output.</div></div><div><div class="label">Explanation</div><div class="lab-output" id="labDecoded">Step notes appear here.</div></div></div></div></section>`:'';
+ const references=refsHTML(l.refs);
+ const code=state.drafts[id]??codeText(l);
+ $('#mainView').innerHTML=`<div class="breadcrumb">Search Lab / ${esc(c.title)}</div>
+<header class="header">
+ <div class="eyebrow">LESSON ${String(index+1).padStart(2,'0')} · ${esc(l.kind)}</div>
+ <h1>${esc(l.title)}</h1>
+ <p>${esc(l.summary)}</p>
+ <div class="tags"><span class="tag">Level ${l.level}</span><span class="tag ${statusClass(l)}">${esc(l.status)}</span><span class="tag">${esc(c.title.replace(/^\d+\.\s*/,''))}</span></div>
+ <div class="header-actions">
+  <button class="btn" id="bookmarkBtn">${state.bookmarks.has(id)?'★ Bookmarked':'☆ Bookmark'}</button>
+  <button class="btn primary" id="completeBtn">${state.completed.has(id)?'✓ Completed':'Mark complete'}</button>
+ </div>
+</header>
+<section class="panel"><div class="panel-head"><h2>1. Understand the idea</h2><p>Plain language and a mental picture</p></div><div class="body idea"><div><p>${esc(l.summary)}</p><p><strong>What problem it solves:</strong> ${esc(l.problem)}</p><div class="takeaway"><strong>Takeaway:</strong> ${esc(l.output)}</div></div><aside class="mental"><small>Mental picture</small><strong>${esc(l.mental)}</strong><p>${esc(l.mentalText)}</p></aside></div></section>
+<section class="panel"><div class="panel-head"><h2>2. Input and output</h2><p>Know what goes in and what comes out</p></div><div class="body two"><div class="mini"><h3>Input</h3><p>${esc(l.input)}</p></div><div class="mini"><h3>Output</h3><p>${esc(l.output)}</p></div></div></section>
+<section class="panel"><div class="panel-head"><h2>3. How it works</h2><p>Step by step, with the key rule that makes it correct</p></div><div class="body two"><div>${listToHTML(l.steps)}<div class="takeaway" style="margin-top:14px"><strong>Key rule:</strong> ${esc(l.invariant)}</div></div><pre class="pseudo">${esc(l.pseudo)}</pre></div><div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>Step</th><th>What happens</th><th>Why it matters</th></tr></thead><tbody>${l.trace.map(r=>`<tr>${r.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>
+${demoArea}
+<section class="panel"><div class="panel-head"><h2>4. Cost and stability</h2><p>Costs depend on data size and structure. These are scope labels, not universal benchmarks.</p></div><div class="body"><div class="tiles">${l.complexity.map((x,i)=>`<div class="tile"><span>${['Time','Space','Interpretation'][i]}</span><strong>${esc(x.split(' ').slice(0,2).join(' '))}</strong><small>${esc(x)}</small></div>`).join('')}</div><div class="two" style="margin-top:12px"><div class="mini"><h3>Strengths</h3><p>${esc(l.strength)}</p></div><div class="mini"><h3>Limits</h3><p>${esc(l.limits)}</p></div></div></div></section>
+<section class="panel"><div class="panel-head"><h2>5. Code and usage</h2><p>Reference code is for learning. Real search code should use a vetted library.</p></div><div class="code-head"><div><span class="tag">${codeRecord(l)?'Python example':'Concept outline, not executable'}</span> <span class="tag">Editable</span></div><div class="header-actions" style="margin:0"><button class="btn" id="copyCode">Copy code</button><button class="btn" id="downloadCode">Download</button></div></div><textarea id="codeEditor" class="code-editor" spellcheck="false" aria-label="Editable Python code">${esc(code)}</textarea><div class="code-foot"><span>${codeRecord(l)?'Reference example. The in-page lab runs its own JavaScript implementation.':'Lesson-specific outline, not an implementation.'}</span><span id="codeStatus">Local draft</span></div><div class="body"><div class="mini"><h3>Where it is used</h3><p>${esc(l.uses)}</p></div><div class="notice" style="margin-top:12px"><strong>Common pitfall:</strong> ${esc(l.pitfall)}</div></div></section>
+<section class="panel"><div class="panel-head"><h2>6. Choices and alternatives</h2><p>Pick based on the data, query type and constraints</p></div><div class="body two"><div class="mini"><h3>When to use this</h3><p>${esc(l.strength)}</p></div><div class="mini"><h3>When to use something else</h3><p>${esc(l.limits)}</p></div></div></section>
+<section class="panel"><div class="panel-head"><h2>7. Check yourself</h2><p>Try to answer before you open the explanation</p></div><div class="body"><details class="practice"><summary>${esc(l.question)}</summary><p>${esc(l.answer)}</p></details></div></section>
+<section class="panel"><div class="panel-head"><h2>8. References</h2><p>Standard references for this topic</p></div><div class="body">${references}<p class="muted" style="font-size:11.5px;margin-top:14px">The labs on this page are teaching implementations. For production work use a vetted library.</p></div></section>
+<footer class="footer"><span>Az Search Lab · local learning</span><span>Lesson ${index+1} of ${LESSONS.length} · Next: ${esc(next.title)}</span><button class="btn" id="nextLesson">Next →</button></footer>`;
+
+ $('#bookmarkBtn').onclick=()=>{state.bookmarks.has(id)?state.bookmarks.delete(id):state.bookmarks.add(id);save();renderLesson(id);toast(state.bookmarks.has(id)?'Bookmarked':'Bookmark removed')};
+ $('#completeBtn').onclick=()=>{state.completed.has(id)?state.completed.delete(id):state.completed.add(id);save();renderTree();renderLesson(id);toast(state.completed.has(id)?'Lesson completed':'Completion removed')};
+ $('#nextLesson').onclick=()=>openLesson(next.id);
+ $('#copyCode').onclick=async()=>{const v=$('#codeEditor').value;try{await navigator.clipboard.writeText(v);toast('Code copied')}catch{const ta=$('#codeEditor');ta.select();document.execCommand('copy');toast('Code copied')}};
+ $('#downloadCode').onclick=()=>{const r=codeRecord(l);downloadText(`${id}.${r?'py':'txt'}`,$('#codeEditor').value,r?'text/x-python':'text/plain')};
+ $('#codeEditor').addEventListener('input',()=>{state.drafts[id]=$('#codeEditor').value;save();$('#codeStatus').textContent='Draft saved locally'});
+ if(hasDemo){
+  $('#runLab').onclick=()=>runLab(l);
+  $('#resetSample').onclick=()=>{$('#labInput').value=l.sample||'';$('#labEncoded').textContent='Run the lab to see output.';$('#labDecoded').textContent='Step notes appear here.'};
+  runLab(l,true);
+ }
+ renderTree();save();
+ if(location.hash!==`#${id}`)history.replaceState(null,'',`#${id}`);
+}
+
+function renderHome(){
+ state.page='home';
+ $('#mainView').innerHTML=`<div class="home-hero"><div class="eyebrow">AZ · ENGINEERING TOOLBOOK</div><h1>Understand searching from linear scan to billion-scale vector search.</h1><p>A beginner friendly course covering search foundations, boundaries, hash and tree lookup, prefix search, compressed text indexes, disk indexes, fuzzy lookup, nearest-neighbour search, vector compression, and spatial and ranked retrieval. Every lesson has a plain explanation and most have a runnable lab.</p><div class="header-actions" style="margin:0"><button class="btn primary" id="startFirst">Start at the beginning</button><button class="btn" id="resumeLesson">Continue lesson</button></div></div>
+<div class="stats"><div class="stat"><strong>${CHAPTERS.length}</strong><span>chapters</span></div><div class="stat"><strong>${LESSONS.length}</strong><span>lessons</span></div><div class="stat"><strong>${LESSONS.filter(l=>l.demo&&l.demo!=='none').length}</strong><span>runnable labs</span></div><div class="stat"><strong>1</strong><span>standalone HTML file</span></div></div>
+<section class="panel"><div class="panel-head"><h2>Honest scope</h2><p>One app covers the whole curriculum. Production search engines are a separate engineering project.</p></div><div class="body two"><div class="mini"><h3>What runs here</h3><p>Linear search, binary search, ternary search, interpolation and exponential search, lower and upper bound, binary search on monotonic predicates, hash table lookup, skip lists, tries, radix tries, ternary search trees, suffix arrays, B-tree and B+ tree layout, inverted indexes, Levenshtein distance, BK-tree search, SymSpell correction, Soundex, k-d tree nearest neighbour, product quantization, scalar quantization, random hyperplane LSH, Eytzinger layout, Z-order curves and Geohash.</p></div><div class="mini"><h3>What does not run here</h3><p>Production implementations of Bε-trees, learned indexes, suffix automata, FM-index, wavelet trees, DAWGs, FSTs, Levenshtein automata, HNSW, IVF, Annoy, ScaNN, DiskANN, WAND, LambdaMART, S2 and H3. For real work use Lucene, FAISS, Annoy, hnswlib, RocksDB, PostgreSQL or another vetted library.</p></div></div></section>
+<div class="panel"><div class="panel-head"><h2>Course map</h2><p>Pick a chapter. The path runs from foundations to billion-scale vector search.</p></div><div class="body"><div class="chapter-cards">${CHAPTERS.map((c,i)=>`<button class="chapter-card" data-chapter="${c.id}"><span class="num">CHAPTER ${String(i+1).padStart(2,'0')} · ${c.ids.length} LESSONS</span><strong>${esc(c.title.replace(/^\d+\.\s*/,''))}</strong><p>${esc(c.desc)}</p></button>`).join('')}</div></div></div>
+<footer class="footer"><span>Az Search Lab</span><span>Single file · no external runtime dependencies</span></footer>`;
+ $('#startFirst').onclick=()=>openLesson('linear-search');
+ $('#resumeLesson').onclick=()=>openLesson(state.current&&byId[state.current]?state.current:'linear-search');
+ $('#mainView').querySelectorAll('[data-chapter]').forEach(b=>b.onclick=()=>{const c=CHAPTERS.find(x=>x.id===b.dataset.chapter);if(c)openLesson(c.ids[0])});
+}
+
+function renderProgressPage(){
+ state.page='progress';
+ $('#mainView').innerHTML=`<div class="breadcrumb">Search Lab / Bookmarks & progress</div><header class="header"><div class="eyebrow">LOCAL ONLY</div><h1>Bookmarks and progress</h1><p>Your progress stays in this browser. Export the JSON to move it or keep a backup.</p></header>
+<section class="panel"><div class="panel-head"><h2>Completed lessons</h2></div><div class="body">${state.completed.size?`<div class="references">${[...state.completed].map(id=>`<a href="#${id}" data-open="${id}">${esc(byId[id].title)}</a>`).join('')}</div>`:'<p class="muted">No lessons marked complete yet.</p>'}</div></section>
+<section class="panel"><div class="panel-head"><h2>Bookmarks</h2></div><div class="body">${state.bookmarks.size?`<div class="references">${[...state.bookmarks].map(id=>`<a href="#${id}" data-open="${id}">${esc(byId[id].title)}</a>`).join('')}</div>`:'<p class="muted">No bookmarks yet.</p>'}</div></section>
+<section class="panel"><div class="panel-head"><h2>Progress data</h2></div><div class="body"><div class="header-actions" style="margin:0"><button class="btn primary" id="exportProgress">Export progress JSON</button><button class="btn" id="clearProgress">Clear completion marks</button></div><p class="muted" style="font-size:12.5px;margin-top:14px">Import accepts only known lesson IDs and a supported schema version.</p></div></section>`;
+ $('#mainView').querySelectorAll('[data-open]').forEach(a=>a.onclick=e=>{e.preventDefault();openLesson(a.dataset.open)});
+ $('#exportProgress').onclick=exportProgress;
+ $('#clearProgress').onclick=()=>{if(confirm('Clear all completion marks?')){state.completed.clear();save();renderProgressPage();renderTree();toast('Completion marks cleared')}};
+}
+
+function openLesson(id){if(!byId[id])return;renderLesson(id);renderTree();$('#mainView').focus({preventScroll:true});window.scrollTo(0,0)}
+function downloadText(name,text,type='text/plain'){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),800)}
+function exportProgress(){downloadText('az-search-lab-progress.json',JSON.stringify({schemaVersion:1,completed:[...state.completed],bookmarks:[...state.bookmarks],theme:state.theme,current:state.current,drafts:state.drafts},null,2),'application/json');toast('Progress exported')}
+function importProgressFile(file){
+ if(file.size>2_000_000){toast('Import rejected: file too large');return}
+ const r=new FileReader();
+ r.onload=()=>{try{
+  const d=JSON.parse(r.result);
+  if(!d||d.schemaVersion!==1||!Array.isArray(d.completed)||!Array.isArray(d.bookmarks)||typeof d.drafts!=='object')throw Error('bad schema');
+  if([...d.completed,...d.bookmarks].some(id=>typeof id!=='string'||!byId[id]))throw Error('unknown id');
+  state.completed=new Set(d.completed);
+  state.bookmarks=new Set(d.bookmarks);
+  state.theme=['system','light','dark'].includes(d.theme)?d.theme:'system';
+  state.current=byId[d.current]?d.current:null;
+  state.drafts=Object.fromEntries(Object.entries(d.drafts).filter(([k,v])=>byId[k]&&typeof v==='string'&&v.length<100000));
+  applyTheme();save();renderTree();
+  state.current?openLesson(state.current):renderHome();
+  toast('Progress imported');
+ }catch(e){toast('Import rejected: invalid progress data')}};
+ r.readAsText(file);
+}
+
+function bindGlobal(){
+ $('#themeSelect').onchange=()=>{state.theme=$('#themeSelect').value;applyTheme();save()};
+ $('#printBtn').onclick=()=>print();
+ $('#exportBtn').onclick=exportProgress;
+ $('#importBtn').onclick=()=>$('#importFile').click();
+ $('#importFile').onchange=e=>{if(e.target.files[0])importProgressFile(e.target.files[0]);e.target.value=''};
+ $('#searchInput').oninput=renderTree;
+ $('#chapterFilter').onchange=renderTree;
+ $('#homeLink').onclick=e=>{e.preventDefault();renderHome();history.replaceState(null,'','#home')};
+ $('#courseTree').onclick=e=>{const b=e.target.closest('[data-lesson]');if(b)openLesson(b.dataset.lesson)};
+ document.querySelectorAll('[data-page="home"]').forEach(b=>b.onclick=renderHome);
+ document.querySelectorAll('[data-page="progress"]').forEach(b=>b.onclick=renderProgressPage);
+ document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();$('#searchInput').focus()}
+  if(e.key.toLowerCase()==='t'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){
+   state.theme=state.theme==='dark'?'light':state.theme==='light'?'system':'dark';
+   applyTheme();save();
+  }
+ });
+}
+
+function init(){
+ load();
+ applyTheme();
+ CHAPTERS.forEach(c=>{const op=document.createElement('option');op.value=c.id;op.textContent=c.title;$('#chapterFilter').append(op)});
+ bindGlobal();
+ renderTree();
+ const hash=location.hash.replace(/^#/,'');
+ if(hash&&byId[hash])renderLesson(hash);
+ else if(state.current&&byId[state.current])renderLesson(state.current);
+ else renderHome();
+ progress();
+}
+init();
+</script></body></html>
